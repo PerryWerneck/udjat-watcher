@@ -32,6 +32,8 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="src/include/host.h" />
+		<Unit filename="src/main/host.cc" />
 		<Unit filename="src/main/main.cc" />
 		<Extensions />
 	</Project>

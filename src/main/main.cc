@@ -21,31 +21,59 @@
  #include <iostream>
  #include <udjat/tools/logger.h>
  #include <udjat/tools/application.h>
- #include <udjat/tools/mainloop.h>
+ #include <udjat/tools/systemservice.h>
+ #include <udjat/tools/threadpool.h>
+ #include <udjat/factory.h>
+ #include <host.h>
+ #include <udjat/module.h>
+ #include <udjat/moduleinfo.h>
 
  using namespace std;
  using namespace Udjat;
+
+ #ifdef DEBUG
+	#define SETTINGS_FILE "./devel.xml"
+ #else
+	#define SETTINGS_FILE Quark(Application::DataFile{"watcher.xml"}).c_str()
+ #endif // DEBUG
 
 //---[ Implement ]------------------------------------------------------------------------------------------
 
 int main(int argc, char **argv) {
 
-	int rc = 0;
+	static const Udjat::ModuleInfo moduleinfo{"Remote host monitor"};
 
-	Application::init(argc,argv);
-	Logger::redirect();
+	class Service : public Udjat::SystemService, private Udjat::Factory {
+	protected:
 
-#ifdef DEBUG
-	Logger::enable(Udjat::Logger::Trace);
-	Logger::enable(Udjat::Logger::Debug);
-#endif // DEBUG
+		std::shared_ptr<Abstract::Agent> AgentFactory(const Abstract::Object UDJAT_UNUSED(&parent), const pugi::xml_node &node) const override {
+			return make_shared<Watcher::Host>(node);
+		}
 
-	MainLoop &mainloop = MainLoop::getInstance();
+	public:
+		Service() : Udjat::SystemService{SETTINGS_FILE}, Udjat::Factory("remote-host",moduleinfo) {
+		}
 
-	rc = mainloop.run();
+		virtual ~Service() {
+			Module::unload();
+		}
 
-	Application::finalize();
+		void init() override {
+			SystemService::init();
+			Application::info() << "Running build " << STRINGIZE_VALUE_OF(BUILD_DATE) << endl;
+		}
 
-	return rc;
+		void deinit() override {
+			Application::info() << "Deinitializing" << endl;
+			ThreadPool::getInstance().wait(); // Just in case.
+			SystemService::deinit();
+			Module::unload();
+		}
+
+
+	} ;
+
+	return Service().run(argc,argv);
+
 }
 
