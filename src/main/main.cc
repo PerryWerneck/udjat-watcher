@@ -27,6 +27,7 @@
  #include <host.h>
  #include <udjat/module.h>
  #include <udjat/moduleinfo.h>
+ #include <udjat/tools/logger.h>
 
  using namespace std;
  using namespace Udjat;
@@ -52,6 +53,10 @@ int main(int argc, char **argv) {
 
 	public:
 		Service() : Udjat::SystemService{SETTINGS_FILE}, Udjat::Factory("remote-host",moduleinfo) {
+#ifdef DEBUG
+			Logger::enable(Logger::Trace);
+			Logger::enable(Logger::Debug);
+#endif // DEBUG
 		}
 
 		virtual ~Service() {

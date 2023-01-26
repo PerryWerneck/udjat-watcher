@@ -21,8 +21,13 @@
  #include <udjat/defs.h>
  #include <udjat/tools/object.h>
  #include <udjat/tools/protocol.h>
+ #include <udjat/agent/abstract.h>
+ #include <udjat/tools/intl.h>
+ #include <udjat/tools/logger.h>
  #include <host.h>
  #include <stdexcept>
+ #include <json/reader.h>
+ #include <json/value.h>
 
  using namespace Udjat;
  using namespace std;
@@ -35,6 +40,10 @@
 			throw runtime_error("Required attribute 'url' is missing or empty");
 		}
 
+		if(!timer()) {
+			timer(300);
+		}
+
 	}
 
 	Host::~Host() {
@@ -42,10 +51,60 @@
 
 	bool Host::refresh() {
 
-		String json = Protocol::WorkerFactory(url.c_str())->get();
+		debug("Checking '",url,"'");
 
-		cout << json << endl;
+		Json::Value response;
 
+		{
+			string errors;
+			String text = Protocol::WorkerFactory(url.c_str())->get();
+
+			Json::CharReaderBuilder builder;
+			Json::CharReader * reader = builder.newCharReader();
+
+			bool success = reader->parse(text.c_str(), text.c_str() + text.size(), &response, &errors);
+			delete reader;
+
+			if(!success) {
+				error() << errors << endl << text << endl;
+				throw runtime_error(_("Error parsing server state"));
+			}
+
+		}
+
+		/*
+		if(Logger::enabled(Logger::Trace)) {
+			Logger::String{string{"Response:\n"} + response.toStyledString()}.write(Logger::Trace,name());
+		} else {
+			cout << "Trace is disabled?" << endl;
+		}
+		*/
+
+		if(!response.isObject()) {
+
+			Logger::String{string{"Response is not an object:\n"} + response.toStyledString()}.write(Logger::Error,name());
+
+		} else if(response["global"].isObject()) {
+
+			// It's a legacy server.
+			auto value = response["global"];
+			if(Logger::enabled(Logger::Trace)) {
+				Logger::String{string{"Legacy response:\n"} + value.toStyledString()}.write(Logger::Trace,name());
+			}
+
+
+		} else {
+
+			Logger::String{string{"Unable to identify response format:\n"} + response.toStyledString()}.write(Logger::Error,name());
+
+		}
+
+
+
+//		cout << json << endl;
+
+
+		return false;
 	}
 
  }

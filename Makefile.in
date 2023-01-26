@@ -209,13 +209,13 @@ else
 	@touch valgrind.suppression
 
 	@$(VALGRIND) --leak-check=full --track-origins=yes --gen-suppressions=all --suppressions=valgrind.suppression \
-			$(BINDBG)/$(PACKAGE_NAME)@EXEEXT@
+			$(BINDBG)/$(PACKAGE_NAME)@EXEEXT@ -f
 endif
 
 run-gdb: \
 	$(BINDBG)/$(PACKAGE_NAME)@EXEEXT@
 
-	@gdb --args $(BINDBG)/$(PACKAGE_NAME)@EXEEXT@
+	@gdb --args $(BINDBG)/$(PACKAGE_NAME)@EXEEXT@ -f
 
 $(BINDBG)/$(PACKAGE_NAME)@EXEEXT@: \
 	$(foreach SRC, $(basename $(SOURCES)), $(OBJDBG)/$(SRC).o)

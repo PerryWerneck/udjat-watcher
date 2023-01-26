@@ -13,6 +13,8 @@
 		<state name='online' level='ready' summary='VPN is online' />
 		<state name='not-found' level='unimportant' summary='VPN is not available' forward-to-children='yes' />
 
+		<remote-host url='http://10.24.80.1/mentor/api/json/global'>
+		</remote-host>
 
 	</network-interface>
 		
