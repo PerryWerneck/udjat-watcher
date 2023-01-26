@@ -42,7 +42,10 @@
 		/// @brief Contact host, get current state.
 		bool refresh() override;
 
+		std::shared_ptr<Udjat::Abstract::State> computeState() override;
+
 	};
+
 
 
  }
