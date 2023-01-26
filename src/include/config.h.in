@@ -1,0 +1,55 @@
+/* src/include/config.h.in.  Generated from configure.ac by autoheader.  */
+
+/* Define if you have the iconv() function and it works. */
+#undef HAVE_ICONV
+
+/* Do we have jsoncpp? */
+#undef HAVE_JSONCPP
+
+/* Do we have udjat? */
+#undef HAVE_UDJAT
+
+/* Define as const if the declaration of iconv() needs const. */
+#undef ICONV_CONST
+
+/* Name of package */
+#undef PACKAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* The library major release */
+#undef PACKAGE_MAJOR_RELEASE
+
+/* The app major version */
+#undef PACKAGE_MAJOR_VERSION
+
+/* The library minor release */
+#undef PACKAGE_MINOR_RELEASE
+
+/* The app minor version */
+#undef PACKAGE_MINOR_VERSION
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* The package release */
+#undef PACKAGE_RELEASE
+
+/* The package revision (for configuration file) */
+#undef PACKAGE_REVISION
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Version number of package */
+#undef VERSION

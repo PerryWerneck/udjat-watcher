@@ -30,3 +30,47 @@
 *.exe
 *.out
 *.app
+
+# Autoconf
+Makefile
+aclocal.m4
+autom4te.cache
+configure
+config.h
+stamp-h1
+scripts
+
+# Log files
+*.log
+*.status
+
+# Misc
+doxyfile
+*.[0-9]
+*.pc
+vgcore.*
+*~
+*.cache
+ABOUT-NLS
+intl
+m4
+*.tmp
+po
+doc/html
+
+# CodeBlocks
+*.layout
+.bin
+.obj
+.pot
+*.depend
+*.bak
+app-manifest.xml
+resources.rc
+doxygen/*
+version.h
+permissions
+systemd.preset
+systemd.service
+
+

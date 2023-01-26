@@ -1,0 +1,8 @@
+{
+   invalid-econf
+   Memcheck:Leak
+   match-leak-kinds: definite
+   ...
+   fun:econf_readDirs
+}
+

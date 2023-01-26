@@ -1,0 +1,254 @@
+
+#---[ Paths ]----------------------------------------------------------------------------
+
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+srcdir=@srcdir@
+bindir=@bindir@
+sbindir=@sbindir@
+libdir=@libdir@
+includedir=@includedir@
+datarootdir=@datarootdir@
+localedir=@localedir@
+docdir=@docdir@
+sysconfdir=@sysconfdir@
+
+
+#---[ Configuration ]--------------------------------------------------------------------
+
+PACKAGE_NAME=@PACKAGE_NAME@
+
+SOURCES= \
+	$(wildcard $(srcdir)/src/main/*.cc) \
+	$(wildcard $(srcdir)/src/@OSNAME@/*.cc) \
+	$(wildcard $(srcdir)/src/@OSNAME@/*.rc)
+	
+#---[ Tools ]----------------------------------------------------------------------------
+
+CXX=@CXX@
+CC=@CC@
+LD=@CXX@
+LN_S=@LN_S@
+STRIP=@STRIP@
+MKDIR=@MKDIR_P@
+INSTALL=@INSTALL@
+INSTALL_DATA=@INSTALL_DATA@
+INSTALL_PROGRAM=@INSTALL_PROGRAM@
+VALGRIND=@VALGRIND@
+DOXYGEN=@DOXYGEN@
+WINDRES=@WINDRES@
+ZIP=@ZIP@
+CONVERT=@CONVERT@
+
+#---[ Paths ]----------------------------------------------------------------------------
+
+OBJDIR=.obj
+OBJDBG=$(OBJDIR)/Debug
+OBJRLS=$(OBJDIR)/Release
+
+BINDIR=.bin
+BINDBG=$(BINDIR)/Debug
+BINRLS=$(BINDIR)/Release
+
+#---[ Settings ]-------------------------------------------------------------------------
+
+CFLAGS= \
+	@CFLAGS@ \
+	-g \
+	-Isrc/include \
+	-I$(srcdir)/src/include \
+    -DBUILD_DATE=`date +%Y%m%d` \
+	@UDJAT_CFLAGS@ \
+	@JSON_CFLAGS@
+
+CPPFLAGS= \
+	@CPPFLAGS@ \
+	-g \
+	-Isrc/include \
+	-I$(srcdir)/src/include \
+    -DBUILD_DATE=`date +%Y%m%d` \
+	@UDJAT_CFLAGS@ \
+	@JSON_CFLAGS@
+
+LDFLAGS= \
+	@LDFLAGS@
+
+LIBS= \
+	@LIBS@ \
+	@UDJAT_LIBS@ \
+	@JSON_LIBS@
+
+#---[ Debug Rules ]----------------------------------------------------------------------
+
+$(OBJDBG)/%.o: \
+	%.cc
+
+	@echo $< ...
+	@$(MKDIR) $(dir $@)
+
+	@$(CXX) \
+		$(CFLAGS) \
+		-DDEBUG=1 \
+		-MM -MT $@ -MF $(patsubst %.o,%.d,$@) $<
+
+	@$(CXX) \
+		$(CFLAGS) $(CPPFLAGS) \
+		-Wall -Wextra -fstack-check \
+		-DDEBUG=1 \
+		-o $@ -c $<
+
+$(OBJDBG)/%.o: \
+	%.c
+
+	@echo $< ...
+	@$(MKDIR) $(dir $@)
+
+	@$(CC) \
+		$(CFLAGS) \
+		-DDEBUG=1 \
+		-MM -MT $@ -MF $(patsubst %.o,%.d,$@) $<
+
+	@$(CC) \
+		$(CFLAGS) \
+		-Wall -Wextra -fstack-check \
+		-DDEBUG=1 \
+		-o $@ -c $<
+
+$(OBJDBG)/%.o: \
+	%.rc
+
+	@echo $< ...
+	@$(MKDIR) $(dir $@)
+	@$(WINDRES) $< -O coff -o $@
+
+#---[ Release Rules ]--------------------------------------------------------------------
+
+$(OBJRLS)/%.o: \
+	%.cc
+
+	@echo $< ...
+	@$(MKDIR) $(dir $@)
+
+	@$(CXX) \
+		$(CFLAGS) \
+		-DNDEBUG=1 \
+		-MM -MT $@ -MF $(patsubst %.o,%.d,$@) $<
+
+	@$(CXX) \
+		$(CFLAGS) $(CPPFLAGS) \
+		-DNDEBUG=1 \
+		-o $@ -c $<
+
+$(OBJRLS)/%.o: \
+	%.c
+
+	@echo $< ...
+	@$(MKDIR) $(dir $@)
+
+	@$(CC) \
+		$(CFLAGS) \
+		-DNDEBUG=1 \
+		-MM -MT $@ -MF $(patsubst %.o,%.d,$@) $<
+
+	@$(CC) \
+		$(CFLAGS) \
+		-DNDEBUG=1 \
+		-o $@ -c $<
+
+$(OBJRLS)/%.o: \
+	%.rc
+
+	@echo $< ...
+	@$(MKDIR) $(dir $@)
+	@$(WINDRES) $< -O coff -o $@
+
+#---[ Release Targets ]------------------------------------------------------------------
+
+all: \
+	$(BINRLS)/$(PACKAGE_NAME)@EXEEXT@
+
+Release: \
+	$(BINRLS)/$(PACKAGE_NAME)@EXEEXT@
+
+
+$(BINRLS)/$(PACKAGE_NAME)@EXEEXT@: \
+	$(foreach SRC, $(basename $(SOURCES)), $(OBJRLS)/$(SRC).o)
+
+	@$(MKDIR) $(dir $@)
+	@echo $< ...
+	@$(LD) \
+		-o $@ \
+		$(LDFLAGS) \
+		$(foreach SRC, $(basename $(SOURCES)), $(OBJRLS)/$(SRC).o) \
+		$(LIBS)
+
+stripped: \
+	$(BINRLS)/$(PACKAGE_NAME)@EXEEXT@
+
+	@$(STRIP) \
+		--strip-all \
+		$(BINRLS)/$(PACKAGE_NAME)@EXEEXT@
+
+
+#---[ Install Targets ]------------------------------------------------------------------
+
+
+#---[ Debug Targets ]--------------------------------------------------------------------
+
+Debug: \
+	$(BINDBG)/$(PACKAGE_NAME)@EXEEXT@
+
+run: \
+	$(BINDBG)/$(PACKAGE_NAME)@EXEEXT@
+
+ifeq ($(VALGRIND),no)
+
+	@$(BINDBG)/$(PACKAGE_NAME)@EXEEXT@
+
+else
+	@touch valgrind.suppression
+
+	@$(VALGRIND) --leak-check=full --track-origins=yes --gen-suppressions=all --suppressions=valgrind.suppression \
+			$(BINDBG)/$(PACKAGE_NAME)@EXEEXT@
+endif
+
+run-gdb: \
+	$(BINDBG)/$(PACKAGE_NAME)@EXEEXT@
+
+	@gdb --args $(BINDBG)/$(PACKAGE_NAME)@EXEEXT@
+
+$(BINDBG)/$(PACKAGE_NAME)@EXEEXT@: \
+	$(foreach SRC, $(basename $(SOURCES)), $(OBJDBG)/$(SRC).o)
+
+	@$(MKDIR) $(dir $@)
+	@echo $< ...
+	@$(LD) \
+		-o $@ \
+		$(LDFLAGS) \
+		$(foreach SRC, $(basename $(SOURCES)), $(OBJDBG)/$(SRC).o) \
+		$(LIBS)
+
+#---[ Clean Targets ]--------------------------------------------------------------------
+
+clean: \
+	cleanDebug \
+	cleanRelease
+
+cleanDebug:
+
+	@rm -fr $(OBJDBG)
+	@rm -fr $(BINDBG)
+
+cleanRelease:
+
+	@rm -fr $(OBJRLS)
+	@rm -fr $(BINRLS)
+
+clean: \
+	cleanDebug \
+	cleanRelease
+
+-include $(foreach SRC, $(basename $(SOURCES)), $(OBJDBG)/$(SRC).d)
+-include $(foreach SRC, $(basename $(SOURCES)), $(OBJRLS)/$(SRC).d)
+
+
