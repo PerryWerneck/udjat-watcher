@@ -1,0 +1,120 @@
+!include "MUI2.nsh"
+!include "x64.nsh"
+!include LogicLib.nsh
+
+!define /date BUILDTIME "%Y%m%d"
+
+outfile "${PKGDIR}/@PACKAGE_NAME@-@PACKAGE_MAJOR_VERSION@.@PACKAGE_MINOR_VERSION@-${BUILDTIME}-@host_cpu@.exe"
+
+RequestExecutionLevel admin
+
+installDir "$@PROGRAMFILES@\Banco do Brasil\@PACKAGE_NAME@"
+
+Section
+
+	SetAutoClose true
+
+	${DisableX64FSRedirection}
+
+	setOutPath $INSTDIR
+	
+	# 
+	# Instala binários
+	#
+	file bin\*
+
+	#
+	# Install udjat modules
+	#
+	CreateDirectory "$INSTDIR\modules"	
+	file "/oname=$INSTDIR\modules\udjat-module-http.dll" "lib\udjat-modules\udjat-module-http.dll"
+
+	SetRegView 64
+	
+	WriteRegStr HKLM "SOFTWARE\\@PACKAGE_NAME@\modules" \
+		"load-at-startup" ""
+
+	WriteRegDWORD HKLM "SOFTWARE\@PACKAGE_NAME@\modules" \
+		"preload-from-xml" 1
+
+	WriteRegDWORD HKLM "SOFTWARE\@PACKAGE_NAME@\modules" \
+		"keep-loaded" 0
+	#
+	# Win HTTP module settings
+	#
+	SetRegView 64
+
+	WriteRegDWORD HKLM "SOFTWARE\@PACKAGE_NAME@\http" \
+		"ResolveTimeout" 6000
+
+	WriteRegDWORD HKLM "SOFTWARE\@PACKAGE_NAME@\http" \
+		"ConnectTimeout" 6000
+
+	WriteRegDWORD HKLM "SOFTWARE\@PACKAGE_NAME@\http" \
+		"SendTimeout" 6000,
+
+	WriteRegDWORD HKLM "SOFTWARE\@PACKAGE_NAME@\http" \
+		"ReceiveTimeout" 6000
+
+	#
+	# Versioning staff
+	#
+	SetRegView 64
+
+	WriteRegStr HKLM "SOFTWARE\@PACKAGE_NAME@\version" \
+		"build" "${BUILDTIME}"
+				
+	WriteRegStr HKLM "SOFTWARE\@PACKAGE_NAME@\version" \
+		"installer" "@PACKAGE_MAJOR_VERSION@.@PACKAGE_MINOR_VERSION@" \
+
+	#
+	# Windows uninstall stuff
+	#
+	SetRegView 64
+
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PACKAGE_NAME@" \
+		"DisplayName" "@PACKAGE_NAME@ - @PACKAGE_DESCRIPTION@"
+	
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PACKAGE_NAME@" \
+		"DisplayIcon" "$INSTDIR\@PACKAGE_NAME@.ico"
+	
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PACKAGE_NAME@" \
+		"DisplayVersion" "@PACKAGE_MAJOR_VERSION@.@PACKAGE_MINOR_VERSION@.@PACKAGE_MAJOR_RELEASE@.@PACKAGE_MINOR_RELEASE@"
+
+	#WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PACKAGE_NAME@" \
+	#	"UninstallString" "$INSTDIR\uninstall.exe"
+	
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PACKAGE_NAME@" \
+		"InstallLocation" "$INSTDIR"
+	
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PACKAGE_NAME@" \
+		"NoModify" "1"
+
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PACKAGE_NAME@" \
+		"NoRepair" "1"
+	
+	#	
+	# Cria desinstalador
+	#
+	writeUninstaller $INSTDIR\uninstall.exe
+
+SectionEnd
+
+Section "Uninstall"
+
+	# Delete uninstaller
+	delete $INSTDIR\uninstaller.exe
+
+	# Cleanup register
+	SetRegView 64
+	DeleteRegKey HKLM "SOFTWARE\@PACKAGE_NAME@"
+
+	SetRegView 64
+	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PACKAGE_NAME@"
+	
+	# now delete installed files
+
+	RMDir /r "$INSTDIR"
+
+SectionEnd
+
