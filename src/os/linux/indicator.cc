@@ -27,11 +27,11 @@
 
  namespace Watcher {
 
-	std::shared_ptr<Indicator> Indicator::getInstance() {
+	Indicator & Indicator::getInstance() {
 
-		class Indicator : public Watcher::Indicator {
+		class LinuxIndicator : public Watcher::Indicator {
 		public:
-			Indicator() {
+			LinuxIndicator() {
 			}
 
 			void notify(const char *title, Udjat::Level level, const char *summary, const char *body) override {
@@ -40,11 +40,7 @@
 
 		};
 
-		static std::shared_ptr<Indicator> instance;
-		if(!instance) {
-			instance = make_shared<Indicator>();
-		}
-
+		static LinuxIndicator instance;
 		return instance;
 
 	}

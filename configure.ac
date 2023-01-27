@@ -80,7 +80,7 @@ case "$host" in
 		EXEEXT=".exe"
 		OSNAME="windows"
 
-		CFLAGS="$CFLAGS -D_WIN32_WINNT=0x0600"
+		CPPFLAGS="$CPPFLAGS -D_WIN32_WINNT=0x0600"
 		LIBS="$LIBS -liconv -lws2_32"
 
 		app_win32_revision=$(date +%y.%m.%d.%H)
@@ -109,7 +109,7 @@ dnl		AC_CONFIG_FILES(win/udjatwatcher.nsi)
  	*)
 		EXEEXT=""
 		OSNAME="linux"
-		CFLAGS="$CFLAGS -pthread"
+		CPPFLAGS="$CPPFLAGS -pthread"
 		LDFLAGS="$LDFLAGS -pthread"
 		
 		PKG_CHECK_MODULES( [UDJAT_IPC], [udjat-dbus], AC_DEFINE(HAVE_DBUS,,[Do we have udjat dbus?]), AC_MSG_NOTICE([udjat-dbus not present.]) )

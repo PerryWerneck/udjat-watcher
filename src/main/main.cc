@@ -56,10 +56,12 @@ int main(int argc, char **argv) {
 
 	public:
 		Service() : Udjat::SystemService{SETTINGS_FILE}, Udjat::Factory("server",moduleinfo) {
+
 #ifdef DEBUG
 			Logger::enable(Logger::Trace);
 			Logger::enable(Logger::Debug);
 #endif // DEBUG
+
 		}
 
 		virtual ~Service() {
@@ -69,10 +71,12 @@ int main(int argc, char **argv) {
 		void init() override {
 			SystemService::init();
 			Application::info() << "Running build " << STRINGIZE_VALUE_OF(BUILD_DATE) << endl;
+			Watcher::Indicator::getInstance().show();
 		}
 
 		void deinit() override {
 			Application::info() << "Deinitializing" << endl;
+			Watcher::Indicator::getInstance().hide();
 			ThreadPool::getInstance().wait(); // Just in case.
 			SystemService::deinit();
 			Module::unload();
@@ -88,7 +92,7 @@ int main(int argc, char **argv) {
 				bool activated() const noexcept override {
 					auto agent = Abstract::Agent::root();
 					if(agent) {
-						Watcher::Indicator::getInstance()->set(agent->name(), agent->state());
+						Watcher::Indicator::getInstance().set(agent->name(), agent->state());
 					}
 					return false;
 				}
