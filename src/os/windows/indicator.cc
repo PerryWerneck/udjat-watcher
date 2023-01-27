@@ -38,6 +38,7 @@
  #define WM_USER_SHELLICON	WM_USER+1001
  #define WM_USER_SHOW		WM_USER+1002
  #define WM_USER_HIDE		WM_USER+1003
+ #define WM_USER_NOTIFY		WM_USER+1004
 
  namespace Watcher {
 
@@ -49,6 +50,7 @@
 			iconv_t		local;
 			HICON		icons[ID_STATE_COUNT];
 			HWND 		hwnd;
+			mutex		guard;
 
 			/// @brief Contains information that the system needs to display notifications in the notification area.
 			NOTIFYICONDATA nidApp;
@@ -139,6 +141,8 @@
 
 	void Win32::Indicator::convert(const char *src, CHAR *dst, size_t sz) {
 
+		lock_guard<mutex> lock(guard);
+
 		iconv(local,NULL,NULL,NULL,NULL);	// Reset state
 
 		size_t	  	  szIn		= strlen(src);
@@ -173,6 +177,16 @@
 
 		cout << "NOTIFY: " << title << " - " << body << endl;
 
+		nidApp.hIcon = icons[level];
+		nidApp.hBalloonIcon = icons[level];
+
+		convert(title,nidApp.szInfoTitle,sizeof(nidApp.szInfoTitle));
+		convert(summary,nidApp.szTip,sizeof(nidApp.szTip));
+		convert(body,nidApp.szInfo,sizeof(nidApp.szInfo));
+
+		nidApp.uFlags |= NIF_TIP|NIF_ICON|NIIF_USER|NIIF_LARGE_ICON|NIF_INFO;
+		PostMessage(hwnd,WM_USER_NOTIFY,0,0);
+
 	}
 
 	LRESULT Win32::Indicator::hwndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -190,9 +204,7 @@
 			indicator.nidApp.hIcon = indicator.icons[ID_STATE_UNDEFINED];
 			indicator.nidApp.hBalloonIcon = indicator.icons[ID_STATE_UNDEFINED];
 			indicator.nidApp.uFlags = NIF_TIP|NIF_MESSAGE|NIF_ICON|NIIF_USER|NIIF_LARGE_ICON;
-
-			Shell_NotifyIcon(NIM_ADD, &indicator.nidApp);
-
+			SendMessage(hWnd,WM_USER_SHOW,0,0);
 			break;
 
 		case WM_DESTROY:
@@ -200,9 +212,22 @@
 			break;
 
 		case WM_USER_SHOW:
+			indicator.nidApp.uFlags |= NIF_TIP|NIF_MESSAGE|NIF_ICON|NIIF_USER|NIIF_LARGE_ICON;
+			if(Shell_NotifyIcon(NIM_ADD, &indicator.nidApp)) {
+				indicator.visible = true;
+				indicator.nidApp.uFlags = 0;
+			}
 			break;
 
 		case WM_USER_HIDE:
+			break;
+
+		case WM_USER_NOTIFY:
+			if(!indicator.visible) {
+				SendMessage(hWnd,WM_USER_SHOW,0,0);
+			} else if(Shell_NotifyIcon(NIM_MODIFY, &indicator.nidApp)) {
+				indicator.nidApp.uFlags = 0;
+			}
 			break;
 
 		case WM_USER_SHELLICON:
