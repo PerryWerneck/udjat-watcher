@@ -8,7 +8,7 @@ outfile "${PKGDIR}/@PACKAGE_NAME@-@PACKAGE_MAJOR_VERSION@.@PACKAGE_MINOR_VERSION
 
 RequestExecutionLevel admin
 
-installDir "$@PROGRAMFILES@\Banco do Brasil\@PACKAGE_NAME@"
+installDir "$@PROGRAMFILES@\@PACKAGE_NAME@"
 
 Section
 
