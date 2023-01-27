@@ -9,6 +9,9 @@
 /* Do we have jsoncpp? */
 #undef HAVE_JSONCPP
 
+/* Do we have PUGIXML? */
+#undef HAVE_PUGIXML
+
 /* Do we have udjat? */
 #undef HAVE_UDJAT
 
@@ -53,6 +56,9 @@
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
+
+/* The product name */
+#undef PRODUCT_NAME
 
 /* Version number of package */
 #undef VERSION

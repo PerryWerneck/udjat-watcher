@@ -11,4 +11,4 @@
 #define ID_STATE_WARNING			3
 #define ID_STATE_ERROR				4
 #define ID_STATE_CRITICAL			5
-
+#define ID_STATE_COUNT				6

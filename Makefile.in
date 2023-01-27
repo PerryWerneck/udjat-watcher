@@ -63,7 +63,8 @@ CPPFLAGS= \
     -DBUILD_DATE=`date +%Y%m%d` \
 	@UDJAT_CFLAGS@ \
 	@UDJAT_IPC_CFLAGS@ \
-	@JSON_CFLAGS@
+	@JSON_CFLAGS@ \
+	@PUGIXML_CFLAGS@
 
 LDFLAGS= \
 	@LDFLAGS@
@@ -72,7 +73,8 @@ LIBS= \
 	@LIBS@ \
 	@UDJAT_LIBS@ \
 	@UDJAT_IPC_LIBS@ \
-	@JSON_LIBS@
+	@JSON_LIBS@ \
+	@PUGIXML_LIBS@
 
 #---[ Debug Rules ]----------------------------------------------------------------------
 

@@ -55,7 +55,7 @@ BEGIN
             VALUE "FileVersion",        "@WIN32_VERSION@\0"
             VALUE "LegalCopyright",     "(C) 2023 Perry Werneck. All Rights Reserved\0"
             VALUE "OriginalFilename",   "@PACKAGE_NAME@.exe\0"
-            VALUE "ProductName",        "Udjat.\0"
+            VALUE "ProductName",        "@PRODUCT_NAME@\0"
             VALUE "ProductVersion",     "@PACKAGE_MAJOR_VERSION@.@PACKAGE_MINOR_VERSION@.@PACKAGE_MAJOR_RELEASE@.@PACKAGE_MINOR_RELEASE@\0"
         END
     END

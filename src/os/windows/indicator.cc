@@ -18,10 +18,10 @@
  */
 
  #include <config.h>
- #include <windows.h>
  #include <udjat/defs.h>
  #include <udjat/agent/state.h>
  #include <udjat/agent/level.h>
+ #include <udjat/tools/logger.h>
  #include <iostream>
  #include <indicator.h>
  #include <shellapi.h>
@@ -30,7 +30,12 @@
  #include <string>
  #include "resources.h"
 
+ #ifndef WM_USER_SHELLICON
+	#define WM_USER_SHELLICON WM_USER+1000
+ #endif // WM_USER_SHELLICON
+
  using namespace std;
+ using namespace Udjat;
 
  namespace Watcher {
 
@@ -42,15 +47,18 @@
 			iconv_t		local;
 			mutex		mtx;
 
-			std::string summary;
-			std::string title;
-			std::string body;
-
 			HICON icons[ID_STATE_COUNT];
 
 			HWND hwnd;
 
 			static LRESULT WINAPI hwndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+
+				if(uMsg == WM_USER_SHELLICON) {
+					// systray msg callback
+					debug("Systray message callback");
+					return 0;
+				}
+
 				return DefWindowProc(hWnd, uMsg, wParam, lParam);
 			}
 
@@ -146,9 +154,6 @@
 				memset(&shellicon.nid,0,sizeof(shellicon.nid));
 				shellicon.nid.cbSize = sizeof(NOTIFYICONDATA); 				// sizeof the struct in bytes
 
-				shellicon.nid.uID = 1;
-				shellicon.nid.hWnd = hwnd;
-
 				shellicon.nid.hBalloonIcon = icons[ID_STATE_UNDEFINED];
 				shellicon.nid.dwInfoFlags = NIIF_USER | NIIF_LARGE_ICON;
 
@@ -166,8 +171,9 @@
 			}
 
 			void sync() {
+				debug("Syncing notifier");
 				lock_guard<mutex> lock(mtx);
-				if(this->visible && shellicon.nid.uFlags) {
+				if(shellicon.visible && shellicon.nid.uFlags) {
 					if(Shell_NotifyIcon(NIM_MODIFY, &shellicon.nid)) {
 						shellicon.nid.uFlags = 0;
 					}
@@ -176,10 +182,17 @@
 
 			void show() override {
 				lock_guard<mutex> lock(mtx);
+				debug("Enabling icon");
 				if(!shellicon.visible) {
 					shellicon.nid.uFlags = NIF_TIP|NIF_MESSAGE;
+					shellicon.nid.uCallbackMessage = WM_USER_SHELLICON;
+
 					if(shellicon.nid.hIcon)
 						shellicon.nid.uFlags |= NIF_ICON;
+
+					shellicon.nid.uID = 1;
+					shellicon.nid.hWnd = hwnd;
+
 					Shell_NotifyIcon(NIM_ADD, &shellicon.nid);
 					shellicon.visible = true;
 				}
@@ -187,6 +200,7 @@
 
 			void hide() override {
 				lock_guard<mutex> lock(mtx);
+				debug("Disabling icon");
 				if(!shellicon.visible) {
 					Shell_NotifyIcon(NIM_DELETE, &shellicon.nid);
 					shellicon.visible = false;
@@ -195,11 +209,37 @@
 
 			void notify(const char *title, Udjat::Level level, const char *summary, const char *body) override {
 
-				this->title = title;
-				this->summary = summary;
-				this->body = body;
-
 				cout << "NOTIFY: " << title << " - " << body << endl;
+
+				// https://learn.microsoft.com/en-us/windows/win32/api/shellapi/ns-shellapi-notifyicondataa
+
+				shellicon.nid.hIcon = icons[level];
+				shellicon.nid.dwInfoFlags = NIF_ICON; // The hIcon member is valid.
+
+				if(!shellicon.visible) {
+					show();
+				}
+				sync();
+
+				/*
+				shellicon.nid.hBalloonIcon = icons[level];
+
+				if(title && *title) {
+					convert(title,shellicon.nid.szInfoTitle,sizeof(shellicon.nid.szInfoTitle));
+				}
+
+				if(body && *body) {
+					convert(body,shellicon.nid.szInfo,sizeof(shellicon.nid.szInfo));
+					convert(summary,shellicon.nid.szTip,sizeof(shellicon.nid.szTip));
+				}
+				*/
+
+				//shellicon.nid.uTimeout = 10;
+
+
+				// NIIF_USER | NIIF_LARGE_ICON | NIF_ICON | NIF_TIP | NIF_INFO;
+
+
 			}
 
 		};

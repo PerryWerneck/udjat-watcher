@@ -81,7 +81,7 @@ case "$host" in
 		OSNAME="windows"
 
 		CFLAGS="$CFLAGS -D_WIN32_WINNT=0x0600"
-		LIBS="$LIBS -lws2_32"
+		LIBS="$LIBS -liconv -lws2_32"
 
 		app_win32_revision=$(date +%y.%m.%d.%H)
 		AC_SUBST(WIN32_VERSION,$app_win32_revision)
@@ -170,6 +170,19 @@ dnl ---------------------------------------------------------------------------
 PKG_CHECK_MODULES( [UDJAT], [libudjat], AC_DEFINE(HAVE_UDJAT,,[Do we have udjat?]), AC_MSG_ERROR([libudjat not present.]) )
 AC_SUBST(UDJAT_LIBS)
 AC_SUBST(UDJAT_CFLAGS)
+
+app_cv_product=`pkg-config --variable=product_name libudjat`
+AC_DEFINE_UNQUOTED(PRODUCT_NAME, $app_cv_product, [The product name])
+AC_SUBST(PRODUCT_NAME,$app_cv_product)
+
+dnl ---------------------------------------------------------------------------
+dnl Check for pugixml
+dnl ---------------------------------------------------------------------------
+
+PKG_CHECK_MODULES(PUGIXML, pugixml, AC_DEFINE(HAVE_PUGIXML,[],[Do we have PUGIXML?]),AC_MSG_ERROR(pugixml is required))
+
+AC_SUBST(PUGIXML_LIBS)
+AC_SUBST(PUGIXML_CFLAGS)
 
 dnl ---------------------------------------------------------------------------
 dnl Check for jsoncpp
