@@ -36,7 +36,7 @@
 	public:
 		static Indicator & getInstance();
 
-		void show(const char *title, std::shared_ptr<Udjat::Abstract::State> state);
+		void show(std::shared_ptr<Udjat::Abstract::State> state);
 		void show(const char *title, Udjat::Level level, const char *message);
 
 		virtual void show() = 0;

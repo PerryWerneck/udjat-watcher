@@ -38,18 +38,25 @@
 
 	class State : public Udjat::Abstract::State {
 	private:
-		std::string label;	///< @brief State label.
+		std::string label;
+		std::string summary;
 		std::string body;
 
 	public:
-		State(const char *name, const char *level, const char *l, const char *b) : Abstract::State{name}, label{l}, body{b} {
 
-			Object::properties.summary = label.c_str();
+		/// @brief Build a watcher state.
+		/// @param name	The state name.
+		/// @param level The error level (Defines notification icon).
+		/// @param l The state label (Notification title).
+		/// @param s The state summary (Notification tooltip).
+		/// @param b The state body (Notification text).
+		State(const char *name, const char *l, const char *level, const char *s, const char *b) : Abstract::State{name}, label{l}, summary{s}, body{b} {
+
+			Object::properties.label = label.c_str();
+			Object::properties.summary = summary.c_str();
+
 			properties.level = Udjat::LevelFactory(level);
 			properties.body = body.c_str();
-
-			debug("Level(",level,") = ", properties.level, " ", std::to_string(properties.level));
-			debug("body=",properties.body);
 
 		}
 	};
@@ -80,9 +87,9 @@
 
 		debug("Checking '",url,"'");
 
-		Json::Value response;
+		try {
+			Json::Value response;
 
-		{
 			string errors;
 			String text = Protocol::WorkerFactory(url.c_str())->get();
 
@@ -97,56 +104,57 @@
 				throw runtime_error(_("Error parsing server state"));
 			}
 
-		}
+			if(!response.isObject()) {
 
-		/*
-		if(Logger::enabled(Logger::Trace)) {
-			Logger::String{string{"Response:\n"} + response.toStyledString()}.write(Logger::Trace,name());
-		} else {
-			cout << "Trace is disabled?" << endl;
-		}
-		*/
+				Logger::String{string{"Response is not an object:\n"} + response.toStyledString()}.write(Logger::Error,name());
 
-		if(!response.isObject()) {
+			} else if(response["global"].isObject()) {
 
-			Logger::String{string{"Response is not an object:\n"} + response.toStyledString()}.write(Logger::Error,name());
+				// It's a legacy server.
+				auto value = response["global"];
+				if(Logger::enabled(Logger::Trace)) {
+					Logger::String{string{"Legacy response:\n"} + value.toStyledString()}.write(Logger::Trace,name());
+				}
 
-		} else if(response["global"].isObject()) {
+				// {
+				// 	"className" : "critical",
+				// 	"href" : "",
+				// 	"msg" : "Uso da parti\u00e7\u00e3o de sistema acima de 80%",
+				// 	"name" : "sys80",
+				// 	"state" : 4,
+				// 	"summary" : "/ acima 80%"
+				// }
 
-			// It's a legacy server.
-			auto value = response["global"];
-			if(Logger::enabled(Logger::Trace)) {
-				Logger::String{string{"Legacy response:\n"} + value.toStyledString()}.write(Logger::Trace,name());
+				this->state = make_shared<Watcher::State>(
+					"http-ok",
+					name(),
+					value["className"].asCString(),
+					value["summary"].asCString(),
+					value["msg"].asCString()
+				);
+
+				return set(this->state);
+
+			} else {
+
+				Logger::String{string{"Unable to identify response format:\n"} + response.toStyledString()}.write(Logger::Error,name());
+
 			}
 
-			// {
-			// 	"className" : "critical",
-			// 	"href" : "",
-			// 	"msg" : "Uso da parti\u00e7\u00e3o de sistema acima de 80%",
-			// 	"name" : "sys80",
-			// 	"state" : 4,
-			// 	"summary" : "/ acima 80%"
-			// }
+		} catch(const std::exception &e) {
+
+			error() << e.what() << endl;
 
 			this->state = make_shared<Watcher::State>(
+				"http-error",
 				name(),
-				value["className"].asCString(),
-				value["summary"].asCString(),
-				value["msg"].asCString()
+				"error",
+				_("Agent update has failed"),
+				e.what()
 			);
 
 			return set(this->state);
-
-		} else {
-
-			Logger::String{string{"Unable to identify response format:\n"} + response.toStyledString()}.write(Logger::Error,name());
-
 		}
-
-
-
-//		cout << json << endl;
-
 
 		return false;
 	}

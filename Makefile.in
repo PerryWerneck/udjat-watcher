@@ -223,6 +223,8 @@ Debug: \
 run: \
 	$(BINDBG)/$(PACKAGE_NAME)@EXEEXT@
 
+	@cp "debug-@OSNAME@.xml" "$(BINDBG)/debug.xml"
+	
 ifeq ($(VALGRIND),no)
 
 	@$(BINDBG)/$(PACKAGE_NAME)@EXEEXT@

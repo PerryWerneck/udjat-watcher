@@ -27,10 +27,10 @@
 
  namespace Watcher {
 
-	void Indicator::show(const char *title, std::shared_ptr<Udjat::Abstract::State> state) {
+	void Indicator::show(std::shared_ptr<Udjat::Abstract::State> state) {
 
 		notify(
-			title,
+			state->label(),
 			state->level(),
 			state->summary(),
 			state->body()

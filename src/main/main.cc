@@ -36,12 +36,6 @@
  using namespace std;
  using namespace Udjat;
 
- #ifdef DEBUG
-	#define SETTINGS_FILE "./devel.xml"
- #else
-	#define SETTINGS_FILE Quark(Application::DataFile{"watcher.xml"}).c_str()
- #endif // DEBUG
-
 //---[ Implement ]------------------------------------------------------------------------------------------
 
 int main(int argc, char **argv) {
@@ -56,7 +50,7 @@ int main(int argc, char **argv) {
 		}
 
 	public:
-		Service() : Udjat::SystemService{SETTINGS_FILE}, Udjat::Factory("server",moduleinfo) {
+		Service() : Udjat::Factory{"server",moduleinfo} {
 
 #ifdef DEBUG
 			Logger::enable(Logger::Trace);
@@ -97,7 +91,7 @@ int main(int argc, char **argv) {
 							Watcher::Indicator::getInstance().show(agent->name(), Udjat::Level::undefined, _("No agents"));
 						} else {
 							auto state = agent->state();
-							Watcher::Indicator::getInstance().show(state->name(), state);
+							Watcher::Indicator::getInstance().show(state);
 						}
 					}
 					return false;
