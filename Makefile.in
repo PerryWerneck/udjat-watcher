@@ -214,6 +214,30 @@ stripped: \
 
 #---[ Install Targets ]------------------------------------------------------------------
 
+install: \
+	install-@OSNAME@
+
+	@$(MKDIR) $(DESTDIR)/$(sysconfdir)/$(PACKAGE_NAME).xml.d
+	@$(INSTALL_DATA) xml.d/[0-5][0-9]-*.xml $(DESTDIR)/$(sysconfdir)/$(PACKAGE_NAME).xml.d
+
+install-linux: \
+	$(BINRLS)/$(PACKAGE_NAME)@EXEEXT@ \
+	install-conf
+
+	@$(MKDIR) $(DESTDIR)/$(bindir)
+	@$(INSTALL_PROGRAM) $(BINRLS)/$(PACKAGE_NAME)@EXEEXT@ $(DESTDIR)/$(bindir)/$(PACKAGE_NAME)
+
+install-windows: \
+	stripped
+
+	@$(MKDIR) $(DESTDIR)/$(bindir)
+	@$(INSTALL_PROGRAM) $(BINRLS)/$(PACKAGE_NAME)@EXEEXT@ $(DESTDIR)/$(bindir)/$(PACKAGE_NAME)@EXEEXT@
+
+install-conf:
+
+	@$(MKDIR) $(DESTDIR)/etc/$(PACKAGE_NAME).conf.d
+	@$(INSTALL_DATA) $(srcdir)/conf.d/0*.conf $(DESTDIR)/etc/$(PACKAGE_NAME).conf.d
+
 
 #---[ Debug Targets ]--------------------------------------------------------------------
 

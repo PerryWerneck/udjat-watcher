@@ -16,13 +16,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
-PROJECTDIR=$(dirname $(dirname $(readlink -f ${0})))
-echo $PROJECTDIR
-
 export TOPDIR=$(mktemp -d)
 export BUILD_ROOT=$(mktemp -d)
-
-ln -sf "$(readlink -f ${PROJECTDIR})" "${TOPDIR}/SOURCES"
 
 REQUIRED_PACKAGES="mingw64-udjat-http"
 

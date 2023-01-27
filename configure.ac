@@ -103,7 +103,7 @@ case "$host" in
 		AC_PATH_TOOL([WINDRES], [windres], [no])
 		AC_PATH_TOOL([ZIP], [zip], [no])
 		AC_CONFIG_FILES(src/os/windows/resources.rc)
-dnl		AC_CONFIG_FILES(win/udjatwatcher.nsi)
+		AC_CONFIG_FILES(win/netwatcher.nsi)
 		;;
 
  	*)

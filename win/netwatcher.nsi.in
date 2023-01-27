@@ -16,18 +16,23 @@ Section
 
 	${DisableX64FSRedirection}
 
-	setOutPath $INSTDIR
-	
 	# 
 	# Instala binários
 	#
+	setOutPath $INSTDIR
 	file bin\*
+
+	#
+	# Install configuration files
+	#
+	SetOutPath "$INSTDIR\xml.d"
+	file /r "etc/@PACKAGE_NAME@.xml.d/*.xml"
 
 	#
 	# Install udjat modules
 	#
-	CreateDirectory "$INSTDIR\modules"	
-	file "/oname=$INSTDIR\modules\udjat-module-http.dll" "lib\udjat-modules\udjat-module-http.dll"
+	SetOutPath "$INSTDIR\modules"
+	file /r "lib\@PRODUCT_NAME@-modules\*.dll"
 
 	SetRegView 64
 	
