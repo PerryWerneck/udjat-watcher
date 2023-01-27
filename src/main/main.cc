@@ -31,6 +31,7 @@
  #include <udjat/moduleinfo.h>
  #include <udjat/tools/logger.h>
  #include <indicator.h>
+ #include <udjat/tools/intl.h>
 
  using namespace std;
  using namespace Udjat;
@@ -92,7 +93,12 @@ int main(int argc, char **argv) {
 				bool activated() const noexcept override {
 					auto agent = Abstract::Agent::root();
 					if(agent) {
-						Watcher::Indicator::getInstance().set(agent->name(), agent->state());
+						if(agent->empty()) {
+							Watcher::Indicator::getInstance().show(agent->name(), Udjat::Level::undefined, _("No agents"));
+						} else {
+							auto state = agent->state();
+							Watcher::Indicator::getInstance().show(state->name(), state);
+						}
 					}
 					return false;
 				}

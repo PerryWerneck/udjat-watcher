@@ -27,7 +27,7 @@
 
  namespace Watcher {
 
-	void Indicator::set(const char *title, std::shared_ptr<Udjat::Abstract::State> state) {
+	void Indicator::show(const char *title, std::shared_ptr<Udjat::Abstract::State> state) {
 
 		notify(
 			title,
@@ -36,6 +36,15 @@
 			state->body()
 		);
 
+	}
+
+	void Indicator::show(const char *title, Udjat::Level level, const char *message) {
+		notify(
+			title,
+			level,
+			message,
+			message
+		);
 	}
 
  }

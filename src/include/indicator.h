@@ -26,12 +26,19 @@
 	class Indicator {
 	protected:
 
-		virtual void notify(const char *title, Udjat::Level level, const char *summary, const char *body = nullptr) = 0;
+		/// @brief Notify user.
+		/// @param title The popup title.
+		/// @param level The current level.
+		/// @param summary The message summary and indicator tooltip.
+		/// @param body The detailed message.
+		virtual void notify(const char *title, Udjat::Level level, const char *summary, const char *body) = 0;
 
 	public:
 		static Indicator & getInstance();
 
-		void set(const char *title, std::shared_ptr<Udjat::Abstract::State> state);
+		void show(const char *title, std::shared_ptr<Udjat::Abstract::State> state);
+		void show(const char *title, Udjat::Level level, const char *message);
+
 		virtual void show() = 0;
 		virtual void hide() = 0;
 

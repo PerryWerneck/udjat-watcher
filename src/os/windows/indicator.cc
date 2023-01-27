@@ -29,6 +29,7 @@
  #include <iconv.h>
  #include <mutex>
  #include <string>
+ #include <udjat/tools/configuration.h>
  #include "resources.h"
 
  using namespace std;
@@ -179,12 +180,21 @@
 
 		nidApp.hIcon = icons[level];
 		nidApp.hBalloonIcon = icons[level];
+		nidApp.uFlags |= NIF_ICON|NIIF_USER|NIIF_LARGE_ICON;
 
-		convert(title,nidApp.szInfoTitle,sizeof(nidApp.szInfoTitle));
-		convert(summary,nidApp.szTip,sizeof(nidApp.szTip));
-		convert(body,nidApp.szInfo,sizeof(nidApp.szInfo));
+		if(title && *title) {
+			convert(title,nidApp.szInfoTitle,sizeof(nidApp.szInfoTitle));
+		}
 
-		nidApp.uFlags |= NIF_TIP|NIF_ICON|NIIF_USER|NIIF_LARGE_ICON|NIF_INFO;
+		if(summary && *summary) {
+			nidApp.uFlags |= NIF_TIP;
+			convert(summary,nidApp.szTip,sizeof(nidApp.szTip));
+		}
+
+		if(body && *body) {
+			convert(body,nidApp.szInfo,sizeof(nidApp.szInfo));
+		}
+
 		PostMessage(hwnd,WM_USER_NOTIFY,0,0);
 
 	}
@@ -200,6 +210,7 @@
 
 			indicator.visible = true;
 			indicator.nidApp.hWnd = hWnd;	// handle of the window which will process this app. messages
+			indicator.nidApp.uCallbackMessage = WM_USER_SHELLICON;
 
 			indicator.nidApp.hIcon = indicator.icons[ID_STATE_UNDEFINED];
 			indicator.nidApp.hBalloonIcon = indicator.icons[ID_STATE_UNDEFINED];
@@ -223,6 +234,8 @@
 			break;
 
 		case WM_USER_NOTIFY:
+			indicator.nidApp.uFlags |= NIF_INFO;
+			indicator.nidApp.uTimeout = Config::Value<unsigned int>{"appindicator","timeout",5000}.get();
 			if(!indicator.visible) {
 				SendMessage(hWnd,WM_USER_SHOW,0,0);
 			} else if(Shell_NotifyIcon(NIM_MODIFY, &indicator.nidApp)) {
@@ -233,6 +246,9 @@
 		case WM_USER_SHELLICON:
 			// systray msg callback
 			debug("Systray message callback");
+			if(LOWORD(lParam) == WM_LBUTTONDOWN) {
+				SendMessage(hWnd,WM_USER_NOTIFY,0,0);
+			}
 			break;
 
 		default:
