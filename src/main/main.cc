@@ -18,6 +18,7 @@
  */
 
  #include <config.h>
+ #include <udjat/defs.h>
  #include <iostream>
  #include <udjat/agent/abstract.h>
  #include <udjat/tools/logger.h>
@@ -92,9 +93,10 @@ int main(int argc, char **argv) {
 					return false;
 				}
 
-				void activate(const std::function<bool(const char *key, std::string &value)> UDJAT_UNUSED(&expander)) override {
+				void activate(const std::function<bool(const char *key, std::string &value)> &expander) override {
 					auto agent = Abstract::Agent::root();
 				}
+
 			};
 
 			auto root = Abstract::Agent::root();
