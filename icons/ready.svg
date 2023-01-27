@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="checkmark" width="305px" height="305px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+ <metadata id="metadata11">
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <g id="g15" fill="#008000">
+  <path id="path2" d="m152.5 1e-3c-84.09 0-152.5 68.411-152.5 152.5s68.412 152.5 152.5 152.5c84.089 0 152.5-68.411 152.5-152.5s-68.411-152.5-152.5-152.5zm0 280c-70.305 0-127.5-57.195-127.5-127.5 0-70.304 57.197-127.5 127.5-127.5 70.304 0 127.5 57.196 127.5 127.5 0 70.305-57.196 127.5-127.5 127.5z"/>
+  <path id="path4" d="m218.47 93.97-90.546 90.547-41.398-41.398c-4.882-4.881-12.796-4.881-17.678 0-4.881 4.882-4.881 12.796 0 17.678l50.237 50.237c2.441 2.44 5.64 3.661 8.839 3.661s6.398-1.221 8.839-3.661l99.385-99.385c4.881-4.882 4.881-12.796 0-17.678-4.882-4.882-12.797-4.882-17.678-1e-3z"/>
+ </g>
+</svg>

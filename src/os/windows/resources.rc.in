@@ -1,40 +1,62 @@
+/* SPDX-License-Identifier: LGPL-3.0-or-later */
+
 /*
-	Recursos para o @PACKAGE_NAME@ windows
+ * Copyright (C) 2021 Perry Werneck <perry.werneck@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
-	$URL: http://suportelinux.df.bb.com.br/svn/suporte/aplicativos/userinfo/client/v2/src/os/windows/resources.rc.in $
-	$Author: c1103788 $ $Date: 2022-02-17 23:36:52 -0300 (qui, 17 fev 2022) $ $Rev: 45801 $
-
-	Referências:
-
-	<https://msdn.microsoft.com/en-us/library/windows/desktop/aa381058(v=vs.85).aspx>
-	<https://stackoverflow.com/questions/1022449/how-to-change-an-executables-properties-windows>
-	<https://stackoverflow.com/questions/708238/how-do-i-add-an-icon-to-a-mingw-gcc-compiled-executable>
-
-
-*/
+/*
+ *
+ *	Referências:
+ *
+ *	<https://msdn.microsoft.com/en-us/library/windows/desktop/aa381058(v=vs.85).aspx>
+ *	<https://stackoverflow.com/questions/1022449/how-to-change-an-executables-properties-windows>
+ *	<https://stackoverflow.com/questions/708238/how-do-i-add-an-icon-to-a-mingw-gcc-compiled-executable>
+ *
+ */
 
 #include <windows.h>
+#include "resources.h"
+
+IDI_BALLOON								ICON	balloon.ico
+IDI_DEFAULT								ICON	default.ico
+IDI_DISABLED							ICON	disabled.ico
+
+IDI_STATE_BEGIN+ID_STATE_UNDEFINED		ICON	undefined.ico
+IDI_STATE_BEGIN+ID_STATE_UNIMPORTANT	ICON	unimportant.ico
+IDI_STATE_BEGIN+ID_STATE_READY			ICON	ready.ico
+IDI_STATE_BEGIN+ID_STATE_WARNING		ICON	warning.ico
+IDI_STATE_BEGIN+ID_STATE_ERROR			ICON	error.ico
+IDI_STATE_BEGIN+ID_STATE_CRITICAL		ICON	critical.ico
 
 VS_VERSION_INFO VERSIONINFO
 FILEVERSION    @WIN32_FILEVERSION@
-PRODUCTVERSION @PACKAGE_MAJOR_VERSION@,@PACKAGE_MINOR_VERSION@,0,0
-
-/*
-CREATEPROCESS_MANIFEST_RESOURCE_ID      RT_MANIFEST "app-manifest.xml"
-*/
+PRODUCTVERSION @PACKAGE_MAJOR_VERSION@,@PACKAGE_MINOR_VERSION@,@PACKAGE_MAJOR_RELEASE@,@PACKAGE_MINOR_RELEASE@
 
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
         BLOCK "041604B0"
         BEGIN
-            VALUE "FileDescription",	"@PACKAGE_DESCRIPTION@\0"
+            VALUE "FileDescription",	"Banco do Brasil S/A.\0"
             VALUE "CompanyName",        "Banco do Brasil S/A.\0"
             VALUE "FileVersion",        "@WIN32_VERSION@\0"
-            VALUE "LegalCopyright",     "(C) 2020 Banco do Brasil S/A. All Rights Reserved\0"
+            VALUE "LegalCopyright",     "(C) 2019 Banco do Brasil S/A. All Rights Reserved\0"
             VALUE "OriginalFilename",   "@PACKAGE_NAME@.exe\0"
-            VALUE "ProductName",        "@PACKAGE_NAME@\0"
-            VALUE "ProductVersion",     "@PACKAGE_MAJOR_VERSION@.@PACKAGE_MINOR_VERSION@.0.0\0"
+            VALUE "ProductName",        "Banco do Brasil S/A.\0"
+            VALUE "ProductVersion",     "@PACKAGE_MAJOR_VERSION@.@PACKAGE_MINOR_VERSION@.@PACKAGE_MAJOR_RELEASE@.@PACKAGE_MINOR_RELEASE@\0"
         END
     END
 

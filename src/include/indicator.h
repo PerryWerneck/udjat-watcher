@@ -24,10 +24,15 @@
  namespace Watcher {
 
 	class Indicator {
+	protected:
+
+		virtual void show() = 0;
+		virtual void hide() = 0;
+		virtual void notify(const char *title, Udjat::Level level, const char *summary, const char *body = nullptr) = 0;
+
 	public:
 		static std::shared_ptr<Indicator> getInstance();
 
-		virtual void notify(const char *title, Udjat::Level level, const char *summary, const char *body = nullptr) = 0;
 		void set(const char *title, std::shared_ptr<Udjat::Abstract::State> state);
 
 	};

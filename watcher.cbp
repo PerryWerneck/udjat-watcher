@@ -32,12 +32,14 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="src/include/config.h" />
 		<Unit filename="src/include/host.h" />
 		<Unit filename="src/include/indicator.h" />
 		<Unit filename="src/main/host.cc" />
 		<Unit filename="src/main/indicator.cc" />
 		<Unit filename="src/main/main.cc" />
 		<Unit filename="src/os/linux/indicator.cc" />
+		<Unit filename="src/os/windows/indicator.cc" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

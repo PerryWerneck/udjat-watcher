@@ -23,6 +23,9 @@ SOURCES= \
 	$(wildcard $(srcdir)/src/os/@OSNAME@/*.cc) \
 	$(wildcard $(srcdir)/src/os/@OSNAME@/*.rc)
 	
+ICONS= \
+	$(wildcard icons/*.svg)
+	
 #---[ Tools ]----------------------------------------------------------------------------
 
 CXX=@CXX@
@@ -108,11 +111,16 @@ $(OBJDBG)/%.o: \
 		-o $@ -c $<
 
 $(OBJDBG)/%.o: \
-	%.rc
+	%.rc \
+	$(foreach ICO, $(basename $(ICONS)), $(OBJDIR)/$(notdir $(ICO)).ico)
 
 	@echo $< ...
 	@$(MKDIR) $(dir $@)
-	@$(WINDRES) $< -O coff -o $@
+	@$(WINDRES) \
+		$< \
+		-O coff \
+		-I$(OBJDIR) \
+		-o $@
 
 #---[ Release Rules ]--------------------------------------------------------------------
 
@@ -149,11 +157,30 @@ $(OBJRLS)/%.o: \
 		-o $@ -c $<
 
 $(OBJRLS)/%.o: \
-	%.rc
+	%.rc \
+	$(foreach ICO, $(basename $(ICONS)), $(OBJDIR)/$(notdir $(ICO)).ico)
 
 	@echo $< ...
 	@$(MKDIR) $(dir $@)
-	@$(WINDRES) $< -O coff -o $@
+	@$(WINDRES) \
+		$< \
+		-O coff \
+		-I$(OBJDIR) \
+		-o $@
+
+$(OBJDIR)/%.ico: \
+	icons/%.svg
+
+	@echo $< ...
+	@$(MKDIR) `dirname $@`
+
+	@$(CONVERT) \
+		-density 384 \
+		-background transparent \
+		$< \
+		-define icon:auto-resize \
+		-colors 256 \
+		$@
 
 #---[ Release Targets ]------------------------------------------------------------------
 
