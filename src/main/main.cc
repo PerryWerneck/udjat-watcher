@@ -19,6 +19,7 @@
 
  #include <config.h>
  #include <iostream>
+ #include <udjat/agent/abstract.h>
  #include <udjat/tools/logger.h>
  #include <udjat/tools/application.h>
  #include <udjat/tools/systemservice.h>
@@ -28,6 +29,7 @@
  #include <udjat/module.h>
  #include <udjat/moduleinfo.h>
  #include <udjat/tools/logger.h>
+ #include <indicator.h>
 
  using namespace std;
  using namespace Udjat;
@@ -52,7 +54,7 @@ int main(int argc, char **argv) {
 		}
 
 	public:
-		Service() : Udjat::SystemService{SETTINGS_FILE}, Udjat::Factory("remote-host",moduleinfo) {
+		Service() : Udjat::SystemService{SETTINGS_FILE}, Udjat::Factory("server",moduleinfo) {
 #ifdef DEBUG
 			Logger::enable(Logger::Trace);
 			Logger::enable(Logger::Debug);
@@ -75,10 +77,39 @@ int main(int argc, char **argv) {
 			Module::unload();
 		}
 
+		int run() noexcept override {
+
+			class Listener : public Activatable {
+			public:
+				constexpr Listener() : Activatable("notifier") {
+				}
+
+				bool activated() const noexcept override {
+					auto agent = Abstract::Agent::root();
+					if(agent) {
+						Watcher::Indicator::getInstance()->set(agent->name(), agent->state());
+					}
+					return false;
+				}
+
+				void activate(const std::function<bool(const char *key, std::string &value)> UDJAT_UNUSED(&expander)) override {
+					auto agent = Abstract::Agent::root();
+				}
+			};
+
+			auto root = Abstract::Agent::root();
+
+			if(root) {
+				root->push_back((Abstract::Agent::Event) (Abstract::Agent::STARTED|Abstract::Agent::STATE_CHANGED), std::make_shared<Listener>());
+			}
+
+			return SystemService::run();
+
+		}
 
 	} ;
 
-	return Service().run(argc,argv);
+	return Service().SystemService::run(argc,argv);
 
 }
 

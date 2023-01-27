@@ -20,8 +20,8 @@ PACKAGE_NAME=@PACKAGE_NAME@
 
 SOURCES= \
 	$(wildcard $(srcdir)/src/main/*.cc) \
-	$(wildcard $(srcdir)/src/@OSNAME@/*.cc) \
-	$(wildcard $(srcdir)/src/@OSNAME@/*.rc)
+	$(wildcard $(srcdir)/src/os/@OSNAME@/*.cc) \
+	$(wildcard $(srcdir)/src/os/@OSNAME@/*.rc)
 	
 #---[ Tools ]----------------------------------------------------------------------------
 
@@ -52,15 +52,6 @@ BINRLS=$(BINDIR)/Release
 
 #---[ Settings ]-------------------------------------------------------------------------
 
-CFLAGS= \
-	@CFLAGS@ \
-	-g \
-	-Isrc/include \
-	-I$(srcdir)/src/include \
-    -DBUILD_DATE=`date +%Y%m%d` \
-	@UDJAT_CFLAGS@ \
-	@JSON_CFLAGS@
-
 CPPFLAGS= \
 	@CPPFLAGS@ \
 	-g \
@@ -68,6 +59,7 @@ CPPFLAGS= \
 	-I$(srcdir)/src/include \
     -DBUILD_DATE=`date +%Y%m%d` \
 	@UDJAT_CFLAGS@ \
+	@UDJAT_IPC_CFLAGS@ \
 	@JSON_CFLAGS@
 
 LDFLAGS= \
@@ -76,6 +68,7 @@ LDFLAGS= \
 LIBS= \
 	@LIBS@ \
 	@UDJAT_LIBS@ \
+	@UDJAT_IPC_LIBS@ \
 	@JSON_LIBS@
 
 #---[ Debug Rules ]----------------------------------------------------------------------
@@ -87,12 +80,12 @@ $(OBJDBG)/%.o: \
 	@$(MKDIR) $(dir $@)
 
 	@$(CXX) \
-		$(CFLAGS) \
+		$(CPPFLAGS) \
 		-DDEBUG=1 \
 		-MM -MT $@ -MF $(patsubst %.o,%.d,$@) $<
 
 	@$(CXX) \
-		$(CFLAGS) $(CPPFLAGS) \
+		$(CPPFLAGS) \
 		-Wall -Wextra -fstack-check \
 		-DDEBUG=1 \
 		-o $@ -c $<
@@ -104,12 +97,12 @@ $(OBJDBG)/%.o: \
 	@$(MKDIR) $(dir $@)
 
 	@$(CC) \
-		$(CFLAGS) \
+		$(CPPFLAGS) \
 		-DDEBUG=1 \
 		-MM -MT $@ -MF $(patsubst %.o,%.d,$@) $<
 
 	@$(CC) \
-		$(CFLAGS) \
+		$(CPPFLAGS) \
 		-Wall -Wextra -fstack-check \
 		-DDEBUG=1 \
 		-o $@ -c $<
@@ -130,12 +123,12 @@ $(OBJRLS)/%.o: \
 	@$(MKDIR) $(dir $@)
 
 	@$(CXX) \
-		$(CFLAGS) \
+		$(CPPFLAGS) \
 		-DNDEBUG=1 \
 		-MM -MT $@ -MF $(patsubst %.o,%.d,$@) $<
 
 	@$(CXX) \
-		$(CFLAGS) $(CPPFLAGS) \
+		$(CPPFLAGS) $(CPPFLAGS) \
 		-DNDEBUG=1 \
 		-o $@ -c $<
 
@@ -146,12 +139,12 @@ $(OBJRLS)/%.o: \
 	@$(MKDIR) $(dir $@)
 
 	@$(CC) \
-		$(CFLAGS) \
+		$(CPPFLAGS) \
 		-DNDEBUG=1 \
 		-MM -MT $@ -MF $(patsubst %.o,%.d,$@) $<
 
 	@$(CC) \
-		$(CFLAGS) \
+		$(CPPFLAGS) \
 		-DNDEBUG=1 \
 		-o $@ -c $<
 

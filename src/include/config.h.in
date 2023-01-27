@@ -1,5 +1,8 @@
 /* src/include/config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Do we have udjat dbus? */
+#undef HAVE_DBUS
+
 /* Define if you have the iconv() function and it works. */
 #undef HAVE_ICONV
 

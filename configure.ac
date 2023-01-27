@@ -111,6 +111,9 @@ dnl		AC_CONFIG_FILES(win/udjatwatcher.nsi)
 		OSNAME="linux"
 		CFLAGS="$CFLAGS -pthread"
 		LDFLAGS="$LDFLAGS -pthread"
+		
+		PKG_CHECK_MODULES( [UDJAT_IPC], [udjat-dbus], AC_DEFINE(HAVE_DBUS,,[Do we have udjat dbus?]), AC_MSG_NOTICE([udjat-dbus not present.]) )
+		
 
 dnl		AC_CONFIG_FILES(sysconf/linux/logrotate)
 dnl		AC_CONFIG_FILES(sysconf/linux/permissions)
@@ -128,6 +131,9 @@ AC_SUBST(LIBS)
 AC_SUBST(EXEEXT)
 AC_SUBST(OSNAME)
 AC_SUBST(RLS_LDFLAGS)
+
+AC_SUBST(UDJAT_IPC_LIBS)
+AC_SUBST(UDJAT_IPC_CFLAGS)
 
 dnl ---------------------------------------------------------------------------
 dnl Check for other programs

@@ -29,7 +29,7 @@
  #include <stdexcept>
  #include <json/reader.h>
  #include <json/value.h>
- #include <udjat/agent/level.h>
+ #include <udjat/agent/state.h>
 
  using namespace Udjat;
  using namespace std;
@@ -38,13 +38,11 @@
 
 	class State : public Udjat::Abstract::State {
 	private:
-		std::string name;	///< @brief State name.
 		std::string label;	///< @brief State label.
 		std::string body;
 
 	public:
-		State(const char *n, const char *level, const char *l, const char *b) : Abstract::State{"unnamed"}, name{n}, label{l}, body{b} {
-			rename(name.c_str());
+		State(const char *name, const char *level, const char *l, const char *b) : Abstract::State{name}, label{l}, body{b} {
 
 			Object::properties.summary = label.c_str();
 			properties.level = Udjat::LevelFactory(level);
@@ -131,7 +129,7 @@
 			// }
 
 			this->state = make_shared<Watcher::State>(
-				value["name"].asCString(),
+				name(),
 				value["className"].asCString(),
 				value["summary"].asCString(),
 				value["msg"].asCString()
