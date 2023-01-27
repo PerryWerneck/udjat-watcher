@@ -218,7 +218,7 @@ install: \
 	install-@OSNAME@
 
 	@$(MKDIR) $(DESTDIR)/$(sysconfdir)/$(PACKAGE_NAME).xml.d
-	@$(INSTALL_DATA) xml.d/[0-5][0-9]-*.xml $(DESTDIR)/$(sysconfdir)/$(PACKAGE_NAME).xml.d
+	@$(INSTALL_DATA) $(srcdir)/xml.d/[0-5][0-9]-*.xml $(DESTDIR)/$(sysconfdir)/$(PACKAGE_NAME).xml.d
 
 install-linux: \
 	$(BINRLS)/$(PACKAGE_NAME)@EXEEXT@ \
