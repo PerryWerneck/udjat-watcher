@@ -38,6 +38,12 @@
 				cout << "NOTIFY: " << title << " - " << body << endl;
 			}
 
+			void show() override {
+			}
+
+			void hide() override {
+			}
+
 		};
 
 		static LinuxIndicator instance;

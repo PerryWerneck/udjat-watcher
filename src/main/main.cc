@@ -106,7 +106,7 @@ int main(int argc, char **argv) {
 			auto root = Abstract::Agent::root();
 
 			if(root) {
-				root->push_back((Abstract::Agent::Event) (Abstract::Agent::STARTED|Abstract::Agent::STATE_CHANGED), std::make_shared<Listener>());
+				root->push_back((Abstract::Agent::Event) (Abstract::Agent::STARTED|Abstract::Agent::LEVEL_CHANGED), std::make_shared<Listener>());
 			}
 
 			return SystemService::run();

@@ -18,6 +18,7 @@
 #
 export TOPDIR=$(mktemp -d)
 export BUILD_ROOT=$(mktemp -d)
+export PKGDIR=$(dirname $(dirname $(readlink -f ${0})))/packages
 
 REQUIRED_PACKAGES="mingw64-udjat-http"
 
