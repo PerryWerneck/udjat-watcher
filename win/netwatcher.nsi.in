@@ -33,7 +33,7 @@ Section
 	# Install configuration files
 	#
 	SetOutPath "$INSTDIR\xml.d"
-	file "etc/*.xml.d/*.xml"
+	file "etc\*.xml.d\*.xml"
 
 	#
 	# Install udjat modules
