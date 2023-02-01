@@ -27,6 +27,10 @@ REQUIRED_PACKAGES="mingw64-udjat-http"
 
 recipe_build_win32
 
+if [ -d ~/public_html/win/packages ]; then
+	ln -f ${PKGDIR}/*.exe ~/public_html/win/packages
+fi
+
 rm -fr "${TOPDIR}"
 rm -fr "${BUILD_ROOT}"
 
