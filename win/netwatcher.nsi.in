@@ -17,22 +17,29 @@ Section
 	${DisableX64FSRedirection}
 
 	# 
-	# Instala binários
+	# Install binaries
 	#
 	setOutPath $INSTDIR
-	file bin\*
+	file "bin\*.exe"
+	file "bin\*.dll"
+	
+	#
+	# Install locale
+	#
+	setOutPath $INSTDIR\locale
+	file /r share\locale\*	
 
 	#
 	# Install configuration files
 	#
 	SetOutPath "$INSTDIR\xml.d"
-	file /r "etc/@PACKAGE_NAME@.xml.d/*.xml"
+	file "etc/*.xml.d/*.xml"
 
 	#
 	# Install udjat modules
 	#
 	SetOutPath "$INSTDIR\modules"
-	file /r "lib\@PRODUCT_NAME@-modules\*.dll"
+	file "lib\*\*\modules\*.dll"
 
 	SetRegView 64
 	
@@ -44,6 +51,17 @@ Section
 
 	WriteRegDWORD HKLM "SOFTWARE\@PACKAGE_NAME@\modules" \
 		"keep-loaded" 0
+
+	#
+	# Application settings
+	#
+	SetRegView 64
+	WriteRegStr HKLM "SOFTWARE\@PACKAGE_NAME@\paths" \
+		"log" "${home}@PACKAGE_NAME@\logs\"
+			
+	WriteRegStr HKLM "SOFTWARE\@PACKAGE_NAME@\paths" \
+		"xml" "${documents}@PACKAGE_NAME@\"
+				
 	#
 	# Win HTTP module settings
 	#
@@ -99,7 +117,7 @@ Section
 		"NoRepair" "1"
 	
 	#	
-	# Cria desinstalador
+	# Build uninstaller
 	#
 	writeUninstaller $INSTDIR\uninstall.exe
 
