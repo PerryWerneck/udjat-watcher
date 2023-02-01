@@ -60,5 +60,8 @@
 /* The product name */
 #undef PRODUCT_NAME
 
+/* The product name */
+#undef PRODUCT_VERSION
+
 /* Version number of package */
 #undef VERSION

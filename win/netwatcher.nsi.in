@@ -33,13 +33,13 @@ Section
 	# Install configuration files
 	#
 	SetOutPath "$INSTDIR\xml.d"
-	file "etc\*.xml.d\*.xml"
+	file "etc\@PACKAGE_NAME@.xml.d\*.xml"
 
 	#
 	# Install udjat modules
 	#
 	SetOutPath "$INSTDIR\modules"
-	file "lib\*\*\modules\*.dll"
+	file "lib\@PRODUCT_NAME@\@PRODUCT_VERSION@\modules\*.dll"
 
 	SetRegView 64
 	
