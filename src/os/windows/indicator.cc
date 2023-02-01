@@ -30,6 +30,7 @@
  #include <mutex>
  #include <string>
  #include <udjat/tools/configuration.h>
+ #include <udjat/win32/charset.h>
  #include "resources.h"
 
  using namespace std;
@@ -48,7 +49,6 @@
 		class Indicator : public Watcher::Indicator {
 		private:
 
-			iconv_t		local;
 			HICON		icons[ID_STATE_COUNT];
 			HWND 		hwnd;
 			mutex		guard;
@@ -60,8 +60,6 @@
 			bool visible = false;
 
 			static LRESULT WINAPI hwndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-			void convert(const char *src, CHAR *dst, size_t sz);
 
 		public:
 			Indicator();
@@ -82,11 +80,9 @@
 
 	Win32::Indicator::Indicator() {
 
-		local = iconv_open("CP1252","UTF-8");
-
 		memset(&nidApp,0,sizeof(nidApp));
 		nidApp.cbSize = sizeof(NOTIFYICONDATA); 	// sizeof the struct in bytes
-		nidApp.uID = 1;								// ID of the icon that willl appear in the system tray
+		nidApp.uID = 1;								// ID of the icon that will appear in the system tray
 
 		WNDCLASSEX wc;
 		memset(&wc,0,sizeof(wc));
@@ -137,33 +133,6 @@
 
 	Win32::Indicator::~Indicator() {
 		DestroyWindow(hwnd);
-		iconv_close(local);
-	}
-
-	void Win32::Indicator::convert(const char *src, CHAR *dst, size_t sz) {
-
-		lock_guard<mutex> lock(guard);
-
-		iconv(local,NULL,NULL,NULL,NULL);	// Reset state
-
-		size_t	  	  szIn		= strlen(src);
-		size_t	  	  szOut		= sz;
-		char		* outBuff	= (char *) dst;
-
-#if defined(WINICONV_CONST)
-		WINICONV_CONST char 	* inBuf 	= (WINICONV_CONST char *) src;
-#elif defined(ICONV_CONST)
-		ICONV_CONST 			* inBuf 	= (ICONV_CONST *) src;
-#else
-		char 		 			* inBuf 	= (char *) src;
-#endif // WINICONV_CONST
-
-		// Limpa buffer de saída.
-		memset(dst,0,sz);
-
-		if(iconv(local,&inBuf,&szIn,&outBuff,&szOut) == ((size_t) -1)) {
-			cerr << "Unable to convert charset of \"" << src << "\"" << endl;
-		}
 	}
 
 	void Win32::Indicator::show() {
@@ -183,16 +152,28 @@
 		nidApp.uFlags |= NIF_ICON|NIIF_USER|NIIF_LARGE_ICON;
 
 		if(title && *title) {
-			convert(title,nidApp.szInfoTitle,sizeof(nidApp.szInfoTitle));
+			strncpy(
+				nidApp.szInfoTitle,
+				Udjat::Win32::Charset::to_windows(title).c_str(),
+				sizeof(nidApp.szInfoTitle)
+			);
 		}
 
 		if(summary && *summary) {
 			nidApp.uFlags |= NIF_TIP;
-			convert(summary,nidApp.szTip,sizeof(nidApp.szTip));
+			strncpy(
+				nidApp.szTip,
+				Udjat::Win32::Charset::to_windows(summary).c_str(),
+				sizeof(nidApp.szTip)
+			);
 		}
 
 		if(body && *body) {
-			convert(body,nidApp.szInfo,sizeof(nidApp.szInfo));
+			strncpy(
+				nidApp.szInfo,
+				Udjat::Win32::Charset::to_windows(body).c_str(),
+				sizeof(nidApp.szInfo)
+			);
 		}
 
 		PostMessage(hwnd,WM_USER_NOTIFY,0,0);
@@ -206,7 +187,11 @@
 		switch(uMsg) {
 		case WM_USER_START:
 
-			indicator.convert(_("Initializing watcher"),indicator.nidApp.szTip,sizeof(indicator.nidApp.szTip));
+			strncpy(
+				indicator.nidApp.szTip,
+				Udjat::Win32::Charset::to_windows(_("Initializing watcher")).c_str(),
+				sizeof(indicator.nidApp.szTip)
+			);
 
 			indicator.visible = true;
 			indicator.nidApp.hWnd = hWnd;	// handle of the window which will process this app. messages
