@@ -41,6 +41,7 @@
  #define WM_USER_SHOW		WM_USER+1002
  #define WM_USER_HIDE		WM_USER+1003
  #define WM_USER_NOTIFY		WM_USER+1004
+ #define WM_USER_UPDATED	WM_USER+1005
 
  namespace Watcher {
 
@@ -145,7 +146,7 @@
 
 	void Win32::Indicator::notify(const char *title, Udjat::Level level, const char *summary, const char *body) {
 
-		cout << "NOTIFY: " << title << " - " << body << endl;
+		cout << "notify\t" << title << " - " << body << " (" << level << ")" << endl;
 
 		nidApp.hIcon = icons[level];
 		nidApp.hBalloonIcon = icons[level];
@@ -176,7 +177,11 @@
 			);
 		}
 
-		PostMessage(hwnd,WM_USER_NOTIFY,0,0);
+		if(level > Level::ready) {
+			PostMessage(hwnd,WM_USER_NOTIFY,0,0);
+		} else {
+			PostMessage(hwnd,WM_USER_UPDATED,0,0);
+		}
 
 	}
 
@@ -218,13 +223,19 @@
 		case WM_USER_HIDE:
 			break;
 
+		case WM_USER_UPDATED:
+			if(indicator.visible && Shell_NotifyIcon(NIM_MODIFY, &indicator.nidApp)) {
+				indicator.nidApp.uFlags = 0;
+			}
+			break;
+
 		case WM_USER_NOTIFY:
 			indicator.nidApp.uFlags |= NIF_INFO;
 			indicator.nidApp.uTimeout = Config::Value<unsigned int>{"appindicator","timeout",5000}.get();
-			if(!indicator.visible) {
+			if(indicator.visible) {
+				SendMessage(hWnd,WM_USER_UPDATED,0,0);
+			} else {
 				SendMessage(hWnd,WM_USER_SHOW,0,0);
-			} else if(Shell_NotifyIcon(NIM_MODIFY, &indicator.nidApp)) {
-				indicator.nidApp.uFlags = 0;
 			}
 			break;
 
@@ -232,7 +243,7 @@
 			// systray msg callback
 			debug("Systray message callback");
 			if(LOWORD(lParam) == WM_LBUTTONDOWN) {
-				SendMessage(hWnd,WM_USER_NOTIFY,0,0);
+				PostMessage(hWnd,WM_USER_NOTIFY,0,0);
 			}
 			break;
 
