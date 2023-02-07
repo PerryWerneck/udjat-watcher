@@ -26,8 +26,8 @@ Section
 	#
 	# Install locale
 	#
-	setOutPath $INSTDIR\locale
-	file /r share\locale\*	
+	#setOutPath $INSTDIR\locale
+	#file /r share\locale\*	
 
 	#
 	# Install configuration files
