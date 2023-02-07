@@ -81,7 +81,7 @@ case "$host" in
 		OSNAME="windows"
 
 		CPPFLAGS="$CPPFLAGS -D_WIN32_WINNT=0x0600"
-		LIBS="$LIBS -liconv -lws2_32"
+		LIBS="$LIBS -liconv -lws2_32 -lcomctl32"
 
 		app_win32_revision=$(date +%y.%m.%d.%H)
 		AC_SUBST(WIN32_VERSION,$app_win32_revision)

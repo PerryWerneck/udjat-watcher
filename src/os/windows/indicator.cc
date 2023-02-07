@@ -33,6 +33,8 @@
  #include <udjat/win32/charset.h>
  #include "resources.h"
 
+ #include <commctrl.h>
+
  using namespace std;
  using namespace Udjat;
 
@@ -84,6 +86,7 @@
 		memset(&nidApp,0,sizeof(nidApp));
 		nidApp.cbSize = sizeof(NOTIFYICONDATA); 	// sizeof the struct in bytes
 		nidApp.uID = 1;								// ID of the icon that will appear in the system tray
+		nidApp.uVersion = NOTIFYICON_VERSION_4;
 
 		WNDCLASSEX wc;
 		memset(&wc,0,sizeof(wc));
@@ -125,8 +128,17 @@
 
 		// Load icons
 		for(size_t ix = 0; ix < (sizeof(icons)/sizeof(icons[0])); ix++) {
-			icons[ix] = LoadIcon(GetModuleHandle(NULL),(LPCTSTR) MAKEINTRESOURCE((IDI_STATE_BEGIN+ix)));
-		}
+//				LoadIconMetric(hInst, MAKEINTRESOURCE(IDI_SMALL), LIM_SMALL, &(nid.hIcon));
+//			icons[ix] = LoadIcon(GetModuleHandle(NULL),(LPCTSTR) MAKEINTRESOURCE((IDI_STATE_BEGIN+ix)));
+
+			// https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconmetric
+			LoadIconMetric(
+				GetModuleHandle(NULL),
+				(PCWSTR) MAKEINTRESOURCE(IDI_STATE_BEGIN+ix),
+				LIM_SMALL,
+				&(icons[ix])
+			);
+	}
 
 		PostMessage(hwnd,WM_USER_START,0,0);
 
@@ -213,24 +225,32 @@
 			break;
 
 		case WM_USER_SHOW:
+			debug("WM_USER_SHOW");
 			indicator.nidApp.uFlags |= NIF_TIP|NIF_MESSAGE|NIF_ICON|NIIF_USER|NIIF_LARGE_ICON;
 			if(Shell_NotifyIcon(NIM_ADD, &indicator.nidApp)) {
 				indicator.visible = true;
 				indicator.nidApp.uFlags = 0;
 			}
+			Shell_NotifyIcon(NIM_SETVERSION, &indicator.nidApp);
 			break;
 
 		case WM_USER_HIDE:
+			if(Shell_NotifyIcon(NIM_DELETE, &indicator.nidApp)) {
+				indicator.visible = false;
+				indicator.nidApp.uFlags = 0;
+			}
 			break;
 
 		case WM_USER_UPDATED:
+			debug("WM_USER_UPDATED");
+			indicator.nidApp.uFlags |= NIF_TIP|NIF_MESSAGE|NIF_ICON|NIIF_USER|NIIF_LARGE_ICON;
 			if(indicator.visible && Shell_NotifyIcon(NIM_MODIFY, &indicator.nidApp)) {
 				indicator.nidApp.uFlags = 0;
 			}
 			break;
 
 		case WM_USER_NOTIFY:
-			indicator.nidApp.uFlags |= NIF_INFO;
+			indicator.nidApp.uFlags |= NIF_INFO|NIF_TIP|NIF_MESSAGE|NIF_ICON|NIIF_USER|NIIF_LARGE_ICON;
 			indicator.nidApp.uTimeout = Config::Value<unsigned int>{"appindicator","timeout",5000}.get();
 			if(indicator.visible) {
 				SendMessage(hWnd,WM_USER_UPDATED,0,0);
