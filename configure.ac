@@ -80,7 +80,6 @@ case "$host" in
 		EXEEXT=".exe"
 		OSNAME="windows"
 
-		CPPFLAGS="$CPPFLAGS -D_WIN32_WINNT=0x0600"
 		LIBS="$LIBS -liconv -lws2_32 -lcomctl32"
 
 		app_win32_revision=$(date +%y.%m.%d.%H)
@@ -96,7 +95,7 @@ case "$host" in
 			app_cv_programfiles="PROGRAMFILES"
 			app_cv_winarch="32"
 		fi
-		
+
 		AC_SUBST(PROGRAMFILES,$app_cv_programfiles)
 		AC_SUBST(WINARCH,$app_cv_winarch)
 
@@ -111,16 +110,16 @@ case "$host" in
 		OSNAME="linux"
 		CPPFLAGS="$CPPFLAGS -pthread"
 		LDFLAGS="$LDFLAGS -pthread"
-		
+
 		PKG_CHECK_MODULES( [UDJAT_IPC], [udjat-dbus], AC_DEFINE(HAVE_DBUS,,[Do we have udjat dbus?]), AC_MSG_NOTICE([udjat-dbus not present.]) )
-		
+
 
 dnl		AC_CONFIG_FILES(sysconf/linux/logrotate)
 dnl		AC_CONFIG_FILES(sysconf/linux/permissions)
 
 dnl		AC_CONFIG_FILES(sysconf/linux/systemd.service)
 dnl		AC_CONFIG_FILES(sysconf/linux/systemd.preset)
-	
+
 esac
 
 AC_SUBST(DATADIR,$app_cv_datadir)

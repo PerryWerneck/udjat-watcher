@@ -128,9 +128,14 @@
 
 		// Load icons
 		for(size_t ix = 0; ix < (sizeof(icons)/sizeof(icons[0])); ix++) {
-//				LoadIconMetric(hInst, MAKEINTRESOURCE(IDI_SMALL), LIM_SMALL, &(nid.hIcon));
-//			icons[ix] = LoadIcon(GetModuleHandle(NULL),(LPCTSTR) MAKEINTRESOURCE((IDI_STATE_BEGIN+ix)));
 
+			icons[ix] =
+				LoadIcon(
+					GetModuleHandle(NULL),
+					(LPCTSTR) MAKEINTRESOURCE((IDI_STATE_BEGIN+ix))
+				);
+
+			/*
 			// https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconmetric
 			LoadIconMetric(
 				GetModuleHandle(NULL),
@@ -138,7 +143,8 @@
 				LIM_SMALL,
 				&(icons[ix])
 			);
-	}
+			*/
+		}
 
 		PostMessage(hwnd,WM_USER_START,0,0);
 
@@ -234,6 +240,7 @@
 				indicator.visible = true;
 				indicator.nidApp.uFlags = 0;
 			}
+			indicator.nidApp.uVersion = NOTIFYICON_VERSION_4;
 			Shell_NotifyIcon(NIM_SETVERSION, &indicator.nidApp);
 			break;
 
