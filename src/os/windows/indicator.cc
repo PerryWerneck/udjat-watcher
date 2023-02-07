@@ -17,6 +17,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+ #define NTDDI_VERSION NTDDI_VISTA
+
  #include <config.h>
  #include <udjat/defs.h>
  #include <udjat/agent/state.h>
@@ -87,6 +89,28 @@
 		nidApp.cbSize = sizeof(NOTIFYICONDATA); 	// sizeof the struct in bytes
 		nidApp.uID = 1;								// ID of the icon that will appear in the system tray
 		nidApp.uVersion = NOTIFYICON_VERSION_4;
+		nidApp.dwState = NIS_SHAREDICON;
+		nidApp.dwStateMask = NIS_SHAREDICON;
+
+		// Load icons
+		for(size_t ix = 0; ix < (sizeof(icons)/sizeof(icons[0])); ix++) {
+
+			icons[ix] =
+				LoadIcon(
+					GetModuleHandle(NULL),
+					(LPCTSTR) MAKEINTRESOURCE((IDI_STATE_BEGIN+ix))
+				);
+
+			/*
+			// https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconmetric
+			LoadIconMetric(
+				GetModuleHandle(NULL),
+				(PCWSTR) MAKEINTRESOURCE(IDI_STATE_BEGIN+ix),
+				LIM_SMALL,
+				&(icons[ix])
+			);
+			*/
+		}
 
 		WNDCLASSEX wc;
 		memset(&wc,0,sizeof(wc));
@@ -96,7 +120,7 @@
 		wc.lpfnWndProc  	= hwndProc;
 		wc.hInstance  		= GetModuleHandle(NULL);
 		wc.lpszClassName  	= PACKAGE_NAME;
-		// wc.hIcon			= icons.def;
+		wc.hIcon			= icons[ID_STATE_UNDEFINED];
 		wc.hCursor			= LoadCursor(NULL, IDC_ARROW);
 		wc.cbWndExtra		= sizeof(LONG_PTR);
 
@@ -126,26 +150,6 @@
 
 		SetWindowLongPtr(hwnd, 0, (LONG_PTR) this);
 
-		// Load icons
-		for(size_t ix = 0; ix < (sizeof(icons)/sizeof(icons[0])); ix++) {
-
-			icons[ix] =
-				LoadIcon(
-					GetModuleHandle(NULL),
-					(LPCTSTR) MAKEINTRESOURCE((IDI_STATE_BEGIN+ix))
-				);
-
-			/*
-			// https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconmetric
-			LoadIconMetric(
-				GetModuleHandle(NULL),
-				(PCWSTR) MAKEINTRESOURCE(IDI_STATE_BEGIN+ix),
-				LIM_SMALL,
-				&(icons[ix])
-			);
-			*/
-		}
-
 		PostMessage(hwnd,WM_USER_START,0,0);
 
 	}
@@ -167,11 +171,8 @@
 
 	void Win32::Indicator::notify(const char *title, Udjat::Level level, const char *summary, const char *body) {
 
-		cout << "notify\t" << title << " - " << body << " (" << level << ")" << endl;
-
 		nidApp.hIcon = icons[level];
 		nidApp.hBalloonIcon = icons[level];
-		nidApp.uFlags |= NIF_ICON|NIIF_USER|NIIF_LARGE_ICON;
 
 		if(title && *title) {
 			strncpy(
@@ -225,7 +226,7 @@
 
 			indicator.nidApp.hIcon = indicator.icons[ID_STATE_UNDEFINED];
 			indicator.nidApp.hBalloonIcon = indicator.icons[ID_STATE_UNDEFINED];
-			indicator.nidApp.uFlags = NIF_TIP|NIF_MESSAGE|NIF_ICON|NIIF_USER|NIIF_LARGE_ICON;
+			indicator.nidApp.uFlags = NIF_TIP|NIF_MESSAGE;
 			SendMessage(hWnd,WM_USER_SHOW,0,0);
 			break;
 
@@ -244,13 +245,6 @@
 			Shell_NotifyIcon(NIM_SETVERSION, &indicator.nidApp);
 			break;
 
-		case WM_USER_HIDE:
-			if(Shell_NotifyIcon(NIM_DELETE, &indicator.nidApp)) {
-				indicator.visible = false;
-				indicator.nidApp.uFlags = 0;
-			}
-			break;
-
 		case WM_USER_UPDATED:
 			debug("WM_USER_UPDATED");
 			indicator.nidApp.uFlags |= NIF_TIP|NIF_MESSAGE|NIF_ICON|NIIF_USER|NIIF_LARGE_ICON;
@@ -259,8 +253,15 @@
 			}
 			break;
 
+		case WM_USER_HIDE:
+			if(Shell_NotifyIcon(NIM_DELETE, &indicator.nidApp)) {
+				indicator.visible = false;
+				indicator.nidApp.uFlags = 0;
+			}
+			break;
+
 		case WM_USER_NOTIFY:
-			indicator.nidApp.uFlags |= NIF_INFO|NIF_TIP|NIF_MESSAGE|NIF_ICON|NIIF_USER|NIIF_LARGE_ICON;
+			indicator.nidApp.uFlags |= NIF_INFO|NIF_TIP|NIF_MESSAGE;
 			indicator.nidApp.uTimeout = Config::Value<unsigned int>{"appindicator","timeout",5000}.get();
 			if(indicator.visible) {
 				SendMessage(hWnd,WM_USER_UPDATED,0,0);
