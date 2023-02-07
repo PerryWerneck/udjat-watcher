@@ -145,6 +145,9 @@
 	}
 
 	Win32::Indicator::~Indicator() {
+		for(size_t ix = 0; ix < (sizeof(icons)/sizeof(icons[0])); ix++) {
+			DestroyIcon(icons[ix]);
+		}
 		DestroyWindow(hwnd);
 	}
 
