@@ -32,6 +32,7 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="Makefile" />
 		<Unit filename="configure.ac" />
 		<Unit filename="src/include/config.h" />
 		<Unit filename="src/include/host.h" />

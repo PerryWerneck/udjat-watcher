@@ -17,8 +17,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
- #define NTDDI_VERSION NTDDI_VISTA
-
  #include <config.h>
  #include <udjat/defs.h>
  #include <udjat/agent/state.h>
@@ -94,6 +92,9 @@
 
 		// Load icons
 		for(size_t ix = 0; ix < (sizeof(icons)/sizeof(icons[0])); ix++) {
+
+			// Check https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadimagea
+			// https://stackoverflow.com/questions/23897103/how-to-properly-update-tray-notification-icon
 
 			icons[ix] =
 				LoadIcon(
