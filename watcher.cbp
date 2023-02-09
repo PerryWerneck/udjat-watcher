@@ -41,6 +41,7 @@
 		<Unit filename="src/main/indicator.cc" />
 		<Unit filename="src/main/main.cc" />
 		<Unit filename="src/os/linux/indicator.cc" />
+		<Unit filename="src/os/windows/app-manifest.xml" />
 		<Unit filename="src/os/windows/indicator.cc" />
 		<Unit filename="src/os/windows/resources.h" />
 		<Unit filename="src/os/windows/resources.rc">

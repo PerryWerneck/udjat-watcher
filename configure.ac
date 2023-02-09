@@ -80,7 +80,7 @@ case "$host" in
 		EXEEXT=".exe"
 		OSNAME="windows"
 
-		LIBS="$LIBS -lshell32"
+		LIBS="$LIBS -lcomctl32"
 
 		app_win32_revision=$(date +%y.%m.%d.%H)
 		AC_SUBST(WIN32_VERSION,$app_win32_revision)

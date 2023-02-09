@@ -52,7 +52,11 @@
 		class Indicator : public Watcher::Indicator {
 		private:
 
-			HICON		icons[ID_STATE_COUNT];
+			struct {
+				HICON small;	///< @brief Corresponds to SM_CXSMICON, the recommended pixel width of a small icon.
+				HICON large;	///< @brief Corresponds toSM_CXICON, the default pixel width of an icon.
+			} icons[ID_STATE_COUNT];
+
 			HWND 		hwnd;
 			mutex		guard;
 
@@ -93,24 +97,21 @@
 		// Load icons
 		for(size_t ix = 0; ix < (sizeof(icons)/sizeof(icons[0])); ix++) {
 
-			// Check https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadimagea
-			// https://stackoverflow.com/questions/23897103/how-to-properly-update-tray-notification-icon
-
-			icons[ix] =
-				LoadIcon(
-					GetModuleHandle(NULL),
-					(LPCTSTR) MAKEINTRESOURCE((IDI_STATE_BEGIN+ix))
-				);
-
-			/*
 			// https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconmetric
 			LoadIconMetric(
 				GetModuleHandle(NULL),
 				(PCWSTR) MAKEINTRESOURCE(IDI_STATE_BEGIN+ix),
 				LIM_SMALL,
-				&(icons[ix])
+				&(icons[ix].small)
 			);
-			*/
+
+			LoadIconMetric(
+				GetModuleHandle(NULL),
+				(PCWSTR) MAKEINTRESOURCE(IDI_STATE_BEGIN+ix),
+				LIM_LARGE,
+				&(icons[ix].large)
+			);
+
 		}
 
 		WNDCLASSEX wc;
@@ -121,7 +122,7 @@
 		wc.lpfnWndProc  	= hwndProc;
 		wc.hInstance  		= GetModuleHandle(NULL);
 		wc.lpszClassName  	= PACKAGE_NAME;
-		wc.hIcon			= icons[ID_STATE_UNDEFINED];
+		wc.hIcon			= icons[ID_STATE_UNDEFINED].small;
 		wc.hCursor			= LoadCursor(NULL, IDC_ARROW);
 		wc.cbWndExtra		= sizeof(LONG_PTR);
 
@@ -156,8 +157,17 @@
 	}
 
 	Win32::Indicator::~Indicator() {
+
+		if(visible) {
+			debug("Removing indicator");
+			if(Shell_NotifyIcon(NIM_DELETE, &nidApp)) {
+				visible = false;
+			}
+		}
+
 		for(size_t ix = 0; ix < (sizeof(icons)/sizeof(icons[0])); ix++) {
-			DestroyIcon(icons[ix]);
+			DestroyIcon(icons[ix].large);
+			DestroyIcon(icons[ix].small);
 		}
 		DestroyWindow(hwnd);
 	}
@@ -172,8 +182,9 @@
 
 	void Win32::Indicator::notify(const char *title, Udjat::Level level, const char *summary, const char *body) {
 
-		nidApp.hIcon = icons[level];
-		nidApp.hBalloonIcon = icons[level];
+		nidApp.hIcon = icons[level].large;
+		nidApp.hBalloonIcon = icons[level].large;
+		nidApp.uFlags |= (NIF_TIP|NIIF_USER|NIIF_LARGE_ICON);
 
 		if(title && *title) {
 			strncpy(
@@ -225,8 +236,8 @@
 			indicator.nidApp.hWnd = hWnd;	// handle of the window which will process this app. messages
 			indicator.nidApp.uCallbackMessage = WM_USER_SHELLICON;
 
-			indicator.nidApp.hIcon = indicator.icons[ID_STATE_UNDEFINED];
-			indicator.nidApp.hBalloonIcon = indicator.icons[ID_STATE_UNDEFINED];
+			indicator.nidApp.hIcon = indicator.icons[ID_STATE_UNDEFINED].large;
+			indicator.nidApp.hBalloonIcon = indicator.icons[ID_STATE_UNDEFINED].large;
 			indicator.nidApp.uFlags = NIF_TIP|NIF_MESSAGE;
 			SendMessage(hWnd,WM_USER_SHOW,0,0);
 			break;
@@ -255,6 +266,7 @@
 			break;
 
 		case WM_USER_HIDE:
+			debug("Removendo icone");
 			if(Shell_NotifyIcon(NIM_DELETE, &indicator.nidApp)) {
 				indicator.visible = false;
 				indicator.nidApp.uFlags = 0;
