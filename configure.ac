@@ -184,8 +184,7 @@ AC_SUBST(PRODUCT_VERSION,$app_cv_product_version)
 
 app_cv_product_id=`$PKG_CONFIG --variable=product_id libudjat`
 AC_DEFINE_UNQUOTED(PRODUCT_ID, $app_cv_product_id, [The product name])
-AC_SUBST(PRODUCT_ID,$app_cv_product_version)
-
+AC_SUBST(PRODUCT_ID,$app_cv_product_id)
 
 dnl ---------------------------------------------------------------------------
 dnl Check for pugixml

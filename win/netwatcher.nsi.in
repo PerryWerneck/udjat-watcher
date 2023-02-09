@@ -119,11 +119,34 @@ Section
 	#	
 	# Build uninstaller
 	#
-	writeUninstaller $INSTDIR\uninstall.exe
+	#writeUninstaller $INSTDIR\uninstall.exe
 
 SectionEnd
 
+Function .onInit
+
+	SetRegView 64
+	ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PACKAGE_NAME@" "InstallLocation"
+	${If} $R0 != ""
+		DetailPrint "Removing previous installation."
+		ExecWait '"$R0\@PACKAGE_NAME@.exe" --uninstall'
+		RMDir /r "$R0"
+	${Else}
+		DetailPrint "No previous installation detected."
+	${EndIf}
+
+FunctionEnd
+
+Function .onInstSuccess
+
+	Exec '"$INSTDIR\@PACKAGE_NAME@.exe" --install'
+
+FunctionEnd
+
 Section "Uninstall"
+
+	# Uninstall app
+	Exec '"$INSTDIR\@PACKAGE_NAME@.exe" --uninstall'
 
 	# Delete uninstaller
 	delete $INSTDIR\uninstaller.exe
