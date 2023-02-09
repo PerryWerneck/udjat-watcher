@@ -77,6 +77,39 @@ int main(int argc, char **argv) {
 			return make_shared<Watcher::Host>(node);
 		}
 
+#ifdef _WIN32
+		int uninstall() override {
+			try {
+
+				Application::ShortCut shortcut;
+				shortcut.remove();
+
+			} catch(const std::exception &e) {
+				cerr << "Shortcut failed: " << e.what() << endl;
+				return -1;
+			}
+
+			return Udjat::Application::uninstall();
+
+		}
+
+		int install() override {
+
+			try {
+
+				Application::ShortCut shortcut;
+				shortcut.save();
+				shortcut.autostart();
+
+			} catch(const std::exception &e) {
+				cerr << "Shortcut failed: " << e.what() << endl;
+				return -1;
+			}
+
+			return Udjat::Application::install();
+		}
+#endif // _WIN32
+
 	public:
 		Application() : Udjat::Factory{"server",moduleinfo} {
 		}

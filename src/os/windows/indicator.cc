@@ -184,7 +184,7 @@
 
 		nidApp.hIcon = icons[level].large;
 		nidApp.hBalloonIcon = icons[level].large;
-		nidApp.uFlags |= (NIF_TIP|NIIF_USER|NIIF_LARGE_ICON);
+		nidApp.uFlags |= (NIF_TIP|NIF_ICON|NIIF_USER|NIIF_LARGE_ICON);
 
 		if(title && *title) {
 			strncpy(
