@@ -3,9 +3,21 @@
     <assemblyIdentity
         version="@PACKAGE_MAJOR_VERSION@.@PACKAGE_MINOR_VERSION@.@PACKAGE_MAJOR_RELEASE@.@PACKAGE_MINOR_RELEASE@"
         processorArchitecture="*"
-        name="br.eti.werneck.@PRODUCT_NAME@.@PACKAGE_NAME@"
+        name="@PRODUCT_ID@.@PACKAGE_NAME@"
         type="win32"
     />
     <description>Server status notifier</description>
+	<dependency>
+		<dependentAssembly>
+			<assemblyIdentity
+				type="win32"
+				name="Microsoft.Windows.Common-Controls"
+				version="6.0.0.0"
+				processorArchitecture="*"
+				publicKeyToken="6595b64144ccf1df"
+				language="*"
+			/>
+		</dependentAssembly>
+	</dependency>    
 </assembly>
 

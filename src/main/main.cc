@@ -42,6 +42,8 @@ int main(int argc, char **argv) {
 
 	static const Udjat::ModuleInfo moduleinfo{"Remote host monitor"};
 
+
+	/*
 	class Service : public Udjat::SystemService, private Udjat::Factory {
 	protected:
 
@@ -116,6 +118,8 @@ int main(int argc, char **argv) {
 	} ;
 
 	return Service().SystemService::run(argc,argv);
+
+	*/
 
 }
 

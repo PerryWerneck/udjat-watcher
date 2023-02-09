@@ -58,6 +58,9 @@
 #undef PACKAGE_VERSION
 
 /* The product name */
+#undef PRODUCT_ID
+
+/* The product name */
 #undef PRODUCT_NAME
 
 /* The product name */
