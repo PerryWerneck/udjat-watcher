@@ -79,6 +79,7 @@ case "$host" in
 	*-mingw32|*-pc-msys)
 		EXEEXT=".exe"
 		OSNAME="windows"
+		app_rls_ldflags="-mwindows"
 
 		LIBS="$LIBS -lcomctl32"
 
@@ -109,6 +110,8 @@ case "$host" in
  	*)
 		EXEEXT=""
 		OSNAME="linux"
+		app_rls_ldflags="-mwindows"
+
 		CPPFLAGS="$CPPFLAGS -pthread"
 		LDFLAGS="$LDFLAGS -pthread"
 
@@ -130,7 +133,7 @@ AC_SUBST(LOGDIR,$app_cv_logdir)
 AC_SUBST(LIBS)
 AC_SUBST(EXEEXT)
 AC_SUBST(OSNAME)
-AC_SUBST(RLS_LDFLAGS)
+AC_SUBST(RLS_LDFLAGS,$app_rls_ldflags)
 
 AC_SUBST(UDJAT_IPC_LIBS)
 AC_SUBST(UDJAT_IPC_CFLAGS)

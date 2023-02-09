@@ -200,7 +200,7 @@ $(BINRLS)/$(PACKAGE_NAME)@EXEEXT@: \
 	@echo $< ...
 	@$(LD) \
 		-o $@ \
-		$(LDFLAGS) \
+		@RLS_LDFLAGS@ $(LDFLAGS) \
 		$(foreach SRC, $(basename $(SOURCES)), $(OBJRLS)/$(SRC).o) \
 		$(LIBS)
 
