@@ -125,6 +125,8 @@ int main(int argc, char **argv) {
 
 	};
 
+	Logger::redirect();
+
 #ifdef DEBUG
 	Logger::verbosity(9);
 	return Application{}.Udjat::Application::run(argc,argv,"./debug.xml");
@@ -132,84 +134,6 @@ int main(int argc, char **argv) {
 	return Application{}.Udjat::Application::run(argc,argv);
 #endif // DEBUG
 
-
-	/*
-	class Service : public Udjat::SystemService, private Udjat::Factory {
-	protected:
-
-		std::shared_ptr<Abstract::Agent> AgentFactory(const Abstract::Object UDJAT_UNUSED(&parent), const pugi::xml_node &node) const override {
-			return make_shared<Watcher::Host>(node);
-		}
-
-	public:
-		Service() : Udjat::Factory{"server",moduleinfo} {
-
-#ifdef DEBUG
-			Logger::enable(Logger::Trace);
-			Logger::enable(Logger::Debug);
-#endif // DEBUG
-
-		}
-
-		virtual ~Service() {
-			Module::unload();
-		}
-
-		void init() override {
-			SystemService::init();
-			Application::info() << "Running build " << STRINGIZE_VALUE_OF(BUILD_DATE) << endl;
-			Watcher::Indicator::getInstance().show();
-		}
-
-		void deinit() override {
-			Application::info() << "Deinitializing" << endl;
-			Watcher::Indicator::getInstance().hide();
-			ThreadPool::getInstance().wait(); // Just in case.
-			SystemService::deinit();
-			Module::unload();
-		}
-
-		int run() noexcept override {
-
-			class Listener : public Activatable {
-			public:
-				constexpr Listener() : Activatable("notifier") {
-				}
-
-				bool activated() const noexcept override {
-					auto agent = Abstract::Agent::root();
-					if(agent) {
-						if(agent->empty()) {
-							Watcher::Indicator::getInstance().show(agent->name(), Udjat::Level::undefined, _("No agents"));
-						} else {
-							auto state = agent->state();
-							Watcher::Indicator::getInstance().show(state);
-						}
-					}
-					return false;
-				}
-
-				void activate(const std::function<bool(const char *key, std::string &value)> &expander) override {
-					auto agent = Abstract::Agent::root();
-				}
-
-			};
-
-			auto root = Abstract::Agent::root();
-
-			if(root) {
-				root->push_back((Abstract::Agent::Event) (Abstract::Agent::STARTED|Abstract::Agent::LEVEL_CHANGED), std::make_shared<Listener>());
-			}
-
-			return SystemService::run();
-
-		}
-
-	} ;
-
-	return Service().SystemService::run(argc,argv);
-
-	*/
 
 }
 
