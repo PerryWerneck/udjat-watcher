@@ -253,7 +253,7 @@ install-windows: \
 	@$(INSTALL_DATA) $(PACKAGE_NAME).ico $(DESTDIR)/$(bindir)/$(PACKAGE_NAME).ico
 
 	@$(MKDIR) $(DESTDIR)/$(docdir)/$(PACKAGE_NAME)
-	@$(INSTALL_DATA) LICENSE $(DESTDIR)/$(docdir)/$(PACKAGE_NAME)
+	@$(INSTALL_DATA) $(srcdir)/LICENSE $(DESTDIR)/$(docdir)/$(PACKAGE_NAME)
 
 install-conf:
 
