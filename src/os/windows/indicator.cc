@@ -162,7 +162,7 @@
 							GetModuleHandle(NULL),
 							MAKEINTRESOURCE(IDI_STATE_BEGIN+ix),
 							IMAGE_ICON,
-							0,0,
+							256,256,
 							LR_DEFAULTSIZE
 						);
 
@@ -257,7 +257,7 @@
 
 	void Win32::Indicator::notify(const char *title, Udjat::Level level, const char *summary, const char *body) {
 
-		nidApp.hIcon = icons[level].large;
+		nidApp.hIcon = icons[level].small;
 		nidApp.hBalloonIcon = icons[level].large;
 		nidApp.uFlags |= (NIF_TIP|NIF_ICON|NIIF_LARGE_ICON);
 		nidApp.dwInfoFlags = NIIF_USER;

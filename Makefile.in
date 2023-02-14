@@ -183,7 +183,6 @@ $(OBJDIR)/%.ico: \
 		-background transparent \
 		$< \
 		-define icon:auto-resize \
-		-colors 256 \
 		$@
 
 $(PACKAGE_NAME).ico: \
@@ -197,7 +196,6 @@ $(PACKAGE_NAME).ico: \
 		-background transparent \
 		$< \
 		-define icon:auto-resize \
-		-colors 256 \
 		$@
 
 #---[ Release Targets ]------------------------------------------------------------------
