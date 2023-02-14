@@ -29,7 +29,7 @@ VIAddVersionKey "LegalCopyright" "GNU GPLv3"
 
 !define MUI_ABORTWARNING
 # !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "LICENSE"
+!insertmacro MUI_PAGE_LICENSE "share/doc/@PACKAGE_NAME@/LICENSE"
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
@@ -54,6 +54,12 @@ Section
 	setOutPath $INSTDIR
 	file "bin\*.exe"
 	file "bin\*.dll"
+	
+	#
+	# Install doc
+	#
+	setOutPath $INSTDIR\doc
+	file /r share\doc\*	
 	
 	#
 	# Install locale
