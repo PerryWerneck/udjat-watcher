@@ -75,3 +75,4 @@ systemd.service
 *.nsi
 netwatcher.ico
 notes.txt
+packages
