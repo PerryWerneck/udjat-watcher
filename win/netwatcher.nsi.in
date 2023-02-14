@@ -11,8 +11,6 @@ RequestExecutionLevel admin
 installDir "$@PROGRAMFILES@\@PRODUCT_NAME@\@PACKAGE_NAME@"
 InstallDirRegKey HKLM "Software\@PACKAGE_NAME@" "InstallLocation"
 
-RequestExecutionLevel admin
-
 # Properties
 VIProductVersion "@PACKAGE_MAJOR_VERSION@.@PACKAGE_MINOR_VERSION@.@PACKAGE_MAJOR_RELEASE@.@PACKAGE_MINOR_RELEASE@"
 VIFileVersion "@WIN32_VERSION@"
@@ -33,10 +31,10 @@ VIAddVersionKey "LegalCopyright" "GNU GPLv3"
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 
-# !insertmacro MUI_UNPAGE_WELCOME
+!insertmacro MUI_UNPAGE_WELCOME
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
-# !insertmacro MUI_UNPAGE_FINISH
+!insertmacro MUI_UNPAGE_FINISH
 
 # Languages
 !insertmacro MUI_LANGUAGE "English"
@@ -141,8 +139,8 @@ Section
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PACKAGE_NAME@" \
 		"DisplayVersion" "@PACKAGE_MAJOR_VERSION@.@PACKAGE_MINOR_VERSION@.@PACKAGE_MAJOR_RELEASE@.@PACKAGE_MINOR_RELEASE@"
 
-	#WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PACKAGE_NAME@" \
-	#	"UninstallString" "$INSTDIR\uninstall.exe"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PACKAGE_NAME@" \
+		"UninstallString" "$INSTDIR\uninstall.exe"
 	
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PACKAGE_NAME@" \
 		"InstallLocation" "$INSTDIR"
@@ -184,7 +182,16 @@ FunctionEnd
 Section "Uninstall"
 
 	# Uninstall app
-	Exec '"$INSTDIR\@PACKAGE_NAME@.exe" --uninstall'
+	SetRegView 64
+	ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PACKAGE_NAME@" "InstallLocation"
+	${If} $R0 != ""
+		DetailPrint "Removing previous installation."
+		ExecWait '"taskkill" /im @PACKAGE_NAME@.exe /t /f'
+		ExecWait '"$R0\@PACKAGE_NAME@.exe" --uninstall'
+		RMDir /r "$R0"
+	${Else}
+		DetailPrint "No previous installation detected."
+	${EndIf}
 
 	# Delete uninstaller
 	delete $INSTDIR\uninstaller.exe
@@ -197,7 +204,6 @@ Section "Uninstall"
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@PACKAGE_NAME@"
 	
 	# now delete installed files
-
 	RMDir /r "$INSTDIR"
 
 SectionEnd
