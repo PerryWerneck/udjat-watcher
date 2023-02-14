@@ -73,4 +73,5 @@ permissions
 systemd.preset
 systemd.service
 *.nsi
-
+netwatcher.ico
+notes.txt

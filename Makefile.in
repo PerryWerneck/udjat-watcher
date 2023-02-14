@@ -114,6 +114,7 @@ $(OBJDBG)/%.o: \
 
 $(OBJDBG)/%.o: \
 	%.rc \
+	$(PACKAGE_NAME).ico \
 	$(foreach ICO, $(basename $(ICONS)), $(OBJDIR)/$(notdir $(ICO)).ico)
 
 	@echo $< ...
@@ -160,6 +161,7 @@ $(OBJRLS)/%.o: \
 
 $(OBJRLS)/%.o: \
 	%.rc \
+	$(PACKAGE_NAME).ico \
 	$(foreach ICO, $(basename $(ICONS)), $(OBJDIR)/$(notdir $(ICO)).ico)
 
 	@echo $< ...
@@ -172,6 +174,20 @@ $(OBJRLS)/%.o: \
 
 $(OBJDIR)/%.ico: \
 	icons/%.svg
+
+	@echo $< ...
+	@$(MKDIR) `dirname $@`
+
+	@$(CONVERT) \
+		-density 384 \
+		-background transparent \
+		$< \
+		-define icon:auto-resize \
+		-colors 256 \
+		$@
+
+$(PACKAGE_NAME).ico: \
+	icons/logo.svg
 
 	@echo $< ...
 	@$(MKDIR) `dirname $@`
@@ -228,10 +244,13 @@ install-linux: \
 	@$(INSTALL_PROGRAM) $(BINRLS)/$(PACKAGE_NAME)@EXEEXT@ $(DESTDIR)/$(bindir)/$(PACKAGE_NAME)
 
 install-windows: \
-	stripped
+	stripped \
+	$(PACKAGE_NAME).ico
 
 	@$(MKDIR) $(DESTDIR)/$(bindir)
 	@$(INSTALL_PROGRAM) $(BINRLS)/$(PACKAGE_NAME)@EXEEXT@ $(DESTDIR)/$(bindir)/$(PACKAGE_NAME)@EXEEXT@
+
+	@$(INSTALL_DATA) $(PACKAGE_NAME).ico $(DESTDIR)/$(bindir)/$(PACKAGE_NAME).ico
 
 install-conf:
 
@@ -286,11 +305,13 @@ cleanDebug:
 
 	@rm -fr $(OBJDBG)
 	@rm -fr $(BINDBG)
+	@rm -f $(PACKAGE_NAME).ico
 
 cleanRelease:
 
 	@rm -fr $(OBJRLS)
 	@rm -fr $(BINRLS)
+	@rm -f $(PACKAGE_NAME).ico
 
 clean: \
 	cleanDebug \

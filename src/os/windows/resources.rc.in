@@ -36,6 +36,8 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 
 CREATEPROCESS_MANIFEST_RESOURCE_ID		RT_MANIFEST	"app-manifest.xml"
 
+1										ICON	@PACKAGE_NAME@.ico
+
 IDI_DEFAULT								ICON	default.ico
 IDI_BALLOON								ICON	balloon.ico
 IDI_DISABLED							ICON	disabled.ico
