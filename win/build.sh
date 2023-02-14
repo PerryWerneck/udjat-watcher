@@ -21,6 +21,7 @@ export BUILD_ROOT=$(mktemp -d)
 export PKGDIR=$(dirname $(dirname $(readlink -f ${0})))/packages
 
 REQUIRED_PACKAGES="mingw64-udjat-http"
+PACKAGE_TYPE="zip"
 
 # From https://github.com/PerryWerneck/builder
 . ~/bin/build-recipe-win32

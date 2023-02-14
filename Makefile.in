@@ -21,10 +21,10 @@ PACKAGE_NAME=@PACKAGE_NAME@
 SOURCES= \
 	$(wildcard $(srcdir)/src/main/*.cc) \
 	$(wildcard $(srcdir)/src/os/@OSNAME@/*.cc) \
-	$(wildcard $(srcdir)/src/os/@OSNAME@/*.rc)
+	$(wildcard src/os/@OSNAME@/*.rc)
 	
 ICONS= \
-	$(wildcard icons/*.svg)
+	$(wildcard $(srcdir)/icons/*.svg)
 	
 #---[ Tools ]----------------------------------------------------------------------------
 
@@ -122,7 +122,7 @@ $(OBJDBG)/%.o: \
 	@$(WINDRES) \
 		$< \
 		-O coff \
-		-I$(OBJDIR) \
+		-I$(OBJDIR) -I$(srcdir)/src/os/@OSNAME@ \
 		-o $@
 
 #---[ Release Rules ]--------------------------------------------------------------------
@@ -169,7 +169,7 @@ $(OBJRLS)/%.o: \
 	@$(WINDRES) \
 		$< \
 		-O coff \
-		-I$(OBJDIR) \
+		-I$(OBJDIR) -I$(srcdir)/src/os/@OSNAME@ \
 		-o $@
 
 $(OBJDIR)/%.ico: \
