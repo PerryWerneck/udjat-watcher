@@ -111,7 +111,7 @@
 
 					Logger::String{"Using shell 32 verion ",((int)VerInfo.dwMajorVersion)," build ",((int)VerInfo.dwBuildNumber)}.trace("indicator");
 
-					if(VerInfo.dwMajorVersion == 6) {
+					if(VerInfo.dwMajorVersion >= 6) {
 						if(VerInfo.dwBuildNumber > 6) {
 							nidApp.cbSize = sizeof(NOTIFYICONDATA);
 						} else {
