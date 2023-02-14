@@ -31,6 +31,8 @@
  #include <string>
  #include <udjat/tools/configuration.h>
  #include <udjat/win32/charset.h>
+ #include <udjat/win32/exception.h>
+ #include <shlwapi.h>
  #include "resources.h"
 
  #include <commctrl.h>
@@ -93,10 +95,82 @@
 		nidApp.uVersion = NOTIFYICON_VERSION_4;
 		nidApp.dwState = NIS_SHAREDICON;
 		nidApp.dwStateMask = NIS_SHAREDICON;
+		nidApp.dwInfoFlags = NIIF_USER|NIIF_LARGE_ICON;
+
+		// https://github.com/OpenNMS-Archives/opennms-windows/blob/master/OpenNMS_Tray/OpenNMS_Tray.cpp
+		{
+			HMODULE hMod = LoadLibrary("shell32.dll");
+			if(hMod) {
+				DLLGETVERSIONPROC fnDllGetVersion = (DLLGETVERSIONPROC) (void *) GetProcAddress(hMod, "DllGetVersion");
+
+				if(fnDllGetVersion) {
+					DLLVERSIONINFO VerInfo;
+					memset(&VerInfo,0,sizeof(VerInfo));
+					VerInfo.cbSize = sizeof(VerInfo);
+					fnDllGetVersion(&VerInfo);
+
+					Logger::String{"Using shell 32 verion ",((int)VerInfo.dwMajorVersion)," build ",((int)VerInfo.dwBuildNumber)}.trace("indicator");
+
+					if(VerInfo.dwMajorVersion == 6) {
+						if(VerInfo.dwBuildNumber > 6) {
+							nidApp.cbSize = sizeof(NOTIFYICONDATA);
+						} else {
+							nidApp.cbSize = NOTIFYICONDATA_V3_SIZE;
+						}
+
+						nidApp.uVersion = NOTIFYICON_VERSION_4;
+
+						Logger::String{"Using notify icon version ",((int) nidApp.uVersion) }.trace("indicator");
+
+					} else if(VerInfo.dwMajorVersion == 5) {
+
+						nidApp.cbSize = NOTIFYICONDATA_V2_SIZE;
+						nidApp.uVersion = NOTIFYICON_VERSION;
+
+						Logger::String{"Using notify icon version ",((int) nidApp.uVersion) }.trace("indicator");
+
+					} else {
+
+						nidApp.cbSize = NOTIFYICONDATA_V1_SIZE;
+						Logger::String{"Using notify icon version 1"}.trace("indicator");
+
+					}
+
+				}
+			}
+
+		}
 
 		// Load icons
 		for(size_t ix = 0; ix < (sizeof(icons)/sizeof(icons[0])); ix++) {
 
+			icons[ix].small =
+				(HICON) LoadImage(
+							GetModuleHandle(NULL),
+							MAKEINTRESOURCE(IDI_STATE_BEGIN+ix),
+							IMAGE_ICON,
+							0,0,
+							LR_DEFAULTSIZE
+						);
+
+			if(!icons[ix].small) {
+				throw Udjat::Win32::Exception(string{"Cant load small icon "} + std::to_string(ix));
+			}
+
+			icons[ix].large =
+				(HICON) LoadImage(
+							GetModuleHandle(NULL),
+							MAKEINTRESOURCE(IDI_STATE_BEGIN+ix),
+							IMAGE_ICON,
+							0,0,
+							LR_DEFAULTSIZE
+						);
+
+			if(!icons[ix].large) {
+				throw Udjat::Win32::Exception(string{"Cant load large icon "} + std::to_string(ix));
+			}
+
+			/*
 			// https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconmetric
 			LoadIconMetric(
 				GetModuleHandle(NULL),
@@ -111,6 +185,7 @@
 				LIM_LARGE,
 				&(icons[ix].large)
 			);
+			*/
 
 		}
 
@@ -184,7 +259,8 @@
 
 		nidApp.hIcon = icons[level].large;
 		nidApp.hBalloonIcon = icons[level].large;
-		nidApp.uFlags |= (NIF_TIP|NIF_ICON|NIIF_USER|NIIF_LARGE_ICON);
+		nidApp.uFlags |= (NIF_TIP|NIF_ICON|NIIF_LARGE_ICON);
+		nidApp.dwInfoFlags = NIIF_USER;
 
 		if(title && *title) {
 			strncpy(
@@ -248,7 +324,9 @@
 
 		case WM_USER_SHOW:
 			debug("WM_USER_SHOW");
-			indicator.nidApp.uFlags |= NIF_TIP|NIF_MESSAGE|NIF_ICON|NIIF_USER|NIIF_LARGE_ICON;
+			indicator.nidApp.uFlags |= NIF_TIP|NIF_MESSAGE|NIF_ICON;
+			indicator.nidApp.dwInfoFlags = NIIF_USER|NIIF_LARGE_ICON;
+
 			if(Shell_NotifyIcon(NIM_ADD, &indicator.nidApp)) {
 				indicator.visible = true;
 				indicator.nidApp.uFlags = 0;
@@ -259,7 +337,8 @@
 
 		case WM_USER_UPDATED:
 			debug("WM_USER_UPDATED");
-			indicator.nidApp.uFlags |= NIF_TIP|NIF_MESSAGE|NIF_ICON|NIIF_USER|NIIF_LARGE_ICON;
+			indicator.nidApp.uFlags |= NIF_TIP|NIF_MESSAGE|NIF_ICON;
+			indicator.nidApp.dwInfoFlags = NIIF_USER|NIIF_LARGE_ICON;
 			if(indicator.visible && Shell_NotifyIcon(NIM_MODIFY, &indicator.nidApp)) {
 				indicator.nidApp.uFlags = 0;
 			}
