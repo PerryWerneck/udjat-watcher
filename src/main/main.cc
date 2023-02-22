@@ -93,7 +93,7 @@ int main(int argc, char **argv) {
 
 		}
 
-		int install() override {
+		int install(const char *name) override {
 
 			try {
 
@@ -106,7 +106,7 @@ int main(int argc, char **argv) {
 				return -1;
 			}
 
-			return Udjat::Application::install();
+			return Udjat::Application::install(name);
 		}
 #endif // _WIN32
 
