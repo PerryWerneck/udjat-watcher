@@ -46,6 +46,8 @@ int main(int argc, char **argv) {
 
 		void root(std::shared_ptr<Abstract::Agent> agent) override {
 
+			debug("---------------> Setting root agent to <------------------------------",agent->name());
+
 			/// @brief Listen for root agent states.
 			class Listener : public Activatable {
 			public:
@@ -53,6 +55,7 @@ int main(int argc, char **argv) {
 				}
 
 				bool activated() const noexcept override {
+					debug("Listener was activated");
 					auto agent = Abstract::Agent::root();
 					if(agent) {
 						auto state = agent->state();
