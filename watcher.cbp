@@ -37,10 +37,12 @@
 		<Unit filename="src/include/config.h" />
 		<Unit filename="src/include/host.h" />
 		<Unit filename="src/include/indicator.h" />
+		<Unit filename="src/include/udjat/linux/notification.h" />
 		<Unit filename="src/main/host.cc" />
 		<Unit filename="src/main/indicator.cc" />
 		<Unit filename="src/main/main.cc" />
 		<Unit filename="src/os/linux/indicator.cc" />
+		<Unit filename="src/os/linux/notification.cc" />
 		<Unit filename="src/os/windows/app-manifest.xml" />
 		<Unit filename="src/os/windows/indicator.cc" />
 		<Unit filename="src/os/windows/resources.h" />
